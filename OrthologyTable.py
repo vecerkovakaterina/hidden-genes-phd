@@ -32,7 +32,7 @@ class OrthologyTable:
             raise FileNotFoundError(f"File {self.table_file} does not exist.")
 
     def get_species_list(self):
-        return self.orthology_df.columns
+        return self.orthology_df.columns.tolist()
 
     def get_assembly_names(self):
         assembly_names = [
