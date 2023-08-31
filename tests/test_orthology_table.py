@@ -33,3 +33,15 @@ def test_parse_orthology_table():
 
     with pytest.raises(ValueError):
         OrthologyTable(orthology_table_invalid_suffix)
+
+
+def test_species_list():
+    ot = OrthologyTable(orthology_table_csv)
+    assert type(ot.get_species_list()) == list
+    assert len(ot.get_species_list()) == 68
+
+
+def test_assembly_names():
+    ot = OrthologyTable(orthology_table_csv)
+    assert type(ot.get_assembly_names()) == list
+    assert len(ot.get_assembly_names()) == 68
