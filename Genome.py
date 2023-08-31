@@ -45,8 +45,7 @@ class Genome:
                 "annotation_gtf"
             ]["ftp"]
         except ValueError:
-            print(f"Invalid assembly name: {species}")
-            return False
+            raise ValueError(f"Invalid assembly name: {species}")
         else:
             return True
 
