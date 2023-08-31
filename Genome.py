@@ -32,9 +32,10 @@ class Genome:
     #     self.download_annotation()
     #     Genome.genomes_dict[self.species] = self
 
-    def unpack_gz(self, gzip_file):
+    @classmethod
+    def unpack_gz(cls, gzip_file, output_file):
         with gzip.open(gzip_file, "rb") as packed:
-            with open(self.genome_file, "wb") as unpacked:
+            with open(output_file, "wb") as unpacked:
                 shutil.copyfileobj(packed, unpacked)
 
     @classmethod
@@ -56,4 +57,4 @@ class Genome:
 
         genome_file_gz = pathlib.Path("genomes", self.species + ".gtf.gz")
         urllib.request.urlretrieve(self.ftp_link, genome_file_gz)
-        self.unpack_gz(genome_file_gz)
+        self.unpack_gz(genome_file_gz, self.genome_file)
