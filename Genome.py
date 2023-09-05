@@ -3,6 +3,15 @@ import pathlib
 import urllib.request
 import gzip
 import shutil
+import requests
+import json
+
+
+def access_ensembl_api(ext):
+    server = "https://rest.ensembl.org"
+    response = requests.get(server + ext, headers={"Content-Type": "application/json"})
+    response = json.dumps(response.json())
+    return response
 
 
 class Genome:
@@ -17,6 +26,7 @@ class Genome:
 
         instance = super().__new__(cls)
         instance.species = species
+        instance.taxonomy_class = ""
         instance.ftp_link = ""
         instance.genome_file = pathlib.Path("genomes/", instance.species + ".gtf")
         instance.download_annotation()
@@ -57,3 +67,14 @@ class Genome:
         genome_file_gz = pathlib.Path("genomes", self.species + ".gtf.gz")
         urllib.request.urlretrieve(self.ftp_link, genome_file_gz)
         self.unpack_gz(genome_file_gz, self.genome_file)
+
+    def get_species_class(self):
+        ens_api_response = access_ensembl_api(
+            f"/taxonomy/classification/{self.species}?"
+        )
+        classes = ["Mammalia", "Aves", "Reptilia", "Actinopteri", "Amphibia"]
+        # for taxon in classes:
+        #     if taxon in ens_api_response:
+        #         self.taxonomy_class = taxon
+        #         return
+        return ens_api_response
