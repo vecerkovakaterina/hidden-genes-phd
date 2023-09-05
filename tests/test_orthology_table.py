@@ -41,7 +41,7 @@ def test_species_list():
     assert len(ot.get_species_list()) == 68
 
 
-def test_assembly_names():
+def test_annotation_names():
     ot = OrthologyTable(orthology_table_csv)
-    assert type(ot.get_assembly_names()) == list
-    assert len(ot.get_assembly_names()) == 68
+    assert type(ot.get_annotation_names()) == list
+    assert len(ot.get_annotation_names()) == 68
