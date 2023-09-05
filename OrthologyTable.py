@@ -34,8 +34,14 @@ class OrthologyTable:
     def get_species_list(self):
         return self.orthology_df.columns.tolist()
 
-    def get_assembly_names(self):
-        assembly_names = [
+    def get_annotation_names(self):
+        annotation_names = [
             "_".join(x.split(" ")).lower() for x in self.get_species_list()
         ]
-        return assembly_names
+        return annotation_names
+
+    # TODO add taxonomy info - class to each species
+
+    @classmethod
+    def transpose_df(cls, df):
+        return df.transpose()
