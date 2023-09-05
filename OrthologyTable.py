@@ -40,8 +40,18 @@ class OrthologyTable:
         ]
         return annotation_names
 
-    # TODO add taxonomy info - class to each species
-
     @classmethod
     def transpose_df(cls, df):
         return df.transpose()
+
+    def add_taxonomy_class_to_df(self, genomes_dict):
+        annotation_names = self.get_annotation_names()
+        transposed_orthology_table = OrthologyTable.transpose_df(self.orthology_df)
+        transposed_orthology_table.index = self.get_annotation_names()
+
+        for annotation in annotation_names:
+            transposed_orthology_table.loc[annotation, "class"] = genomes_dict[
+                annotation
+            ].get_species_class()
+
+        return transposed_orthology_table
