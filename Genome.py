@@ -68,6 +68,4 @@ class Genome:
         for taxon in classes:
             if taxon in ens_api_response:
                 self.taxonomy_class = taxon
-                return
-
-        return ens_api_response
+                return taxon
