@@ -12,7 +12,7 @@ class Genome:
     genomes_dict = {}
 
     def __new__(cls, species):
-        if not cls.assembly_name_exists(species):
+        if not cls.annotation_name_exists(species):
             return None
 
         instance = super().__new__(cls)
@@ -39,13 +39,13 @@ class Genome:
                 shutil.copyfileobj(packed, unpacked)
 
     @classmethod
-    def assembly_name_exists(cls, species):
+    def annotation_name_exists(cls, species):
         try:
             gget.ref(species, which=["gtf"], release=cls.ensembl_release)[species][
                 "annotation_gtf"
             ]["ftp"]
         except ValueError:
-            raise ValueError(f"Invalid assembly name: {species}")
+            raise ValueError(f"Invalid annotation name: {species}")
         else:
             return True
 
