@@ -20,27 +20,13 @@ class Genome:
 
     genomes_dict = {}
 
-    def __new__(cls, species):
-        if not cls.annotation_name_exists(species):
-            return None
-
-        instance = super().__new__(cls)
-        instance.species = species
-        instance.taxonomy_class = ""
-        instance.ftp_link = ""
-        instance.genome_file = pathlib.Path("genomes/", instance.species + ".gtf")
-        instance.download_annotation()
-        Genome.genomes_dict[instance.species] = instance
-
-        return instance
-
-    # def __init__(self, species):
-    #     self.species = species
-    #     self.ftp_link = ""
-    #     self.genome_file = pathlib.Path("genomes/", self.species + ".gtf")
-    #
-    #     self.download_annotation()
-    #     Genome.genomes_dict[self.species] = self
+    def __init__(self, species_name, annotation_name):
+        self.species_name = species_name
+        self.annotation_name = annotation_name
+        self.ftp_link = ""
+        self.genome_file = pathlib.Path("genomes/", self.species_name + ".gtf")
+        self.download_annotation()
+        Genome.genomes_dict[self.species_name] = self
 
     @classmethod
     def unpack_gz(cls, gzip_file, output_file):
@@ -48,33 +34,40 @@ class Genome:
             with open(output_file, "wb") as unpacked:
                 shutil.copyfileobj(packed, unpacked)
 
-    @classmethod
-    def annotation_name_exists(cls, species):
+    def annotation_name_exists(self):
         try:
-            gget.ref(species, which=["gtf"], release=cls.ensembl_release)[species][
-                "annotation_gtf"
-            ]["ftp"]
+            gget.ref(self.annotation_name, which=["gtf"], release=self.ensembl_release)[
+                self.annotation_name
+            ]["annotation_gtf"]["ftp"]
         except ValueError:
-            raise ValueError(f"Invalid annotation name: {species}")
+            raise ValueError(f"Invalid annotation name: {self.annotation_name}")
         else:
             return True
 
-    def download_annotation(self):
-        self.ftp_link = gget.ref(
-            self.species, which=["gtf"], release=self.ensembl_release
-        )[self.species]["annotation_gtf"]["ftp"]
+    def annotation_downloaded(self):
+        return pathlib.Path("genomes", self.annotation_name + ".gtf").exists()
 
-        genome_file_gz = pathlib.Path("genomes", self.species + ".gtf.gz")
-        urllib.request.urlretrieve(self.ftp_link, genome_file_gz)
-        self.unpack_gz(genome_file_gz, self.genome_file)
+    def download_annotation(self):
+        if self.annotation_name_exists():
+            self.ftp_link = gget.ref(
+                self.annotation_name, which=["gtf"], release=self.ensembl_release
+            )[self.annotation_name]["annotation_gtf"]["ftp"]
+
+        if not self.annotation_downloaded():
+            gtf_gz = pathlib.Path("genomes", self.annotation_name + ".gtf.gz")
+            urllib.request.urlretrieve(self.ftp_link, gtf_gz)
+            self.unpack_gz(gtf_gz, self.genome_file)
 
     def get_species_class(self):
         ens_api_response = access_ensembl_api(
-            f"/taxonomy/classification/{self.species}?"
+            f"/taxonomy/classification/{self.species_name}?"
         )
         classes = ["Mammalia", "Aves", "Reptilia", "Actinopteri", "Amphibia"]
-        # for taxon in classes:
-        #     if taxon in ens_api_response:
-        #         self.taxonomy_class = taxon
-        #         return
+
+        # TODO better parse json response
+        for taxon in classes:
+            if taxon in ens_api_response:
+                self.taxonomy_class = taxon
+                return
+
         return ens_api_response
