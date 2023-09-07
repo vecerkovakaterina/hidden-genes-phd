@@ -23,7 +23,7 @@ class Genome:
     def __init__(self, species_name, annotation_name):
         self.species_name = species_name
         self.annotation_name = annotation_name
-        self.ftp_link = ""
+        self.ftp_link = None
         self.genome_file = pathlib.Path("genomes/", self.species_name + ".gtf")
         self.download_annotation()
         Genome.genomes_dict[self.species_name] = self
