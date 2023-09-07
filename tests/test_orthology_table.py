@@ -7,6 +7,7 @@ orthology_table_tsv = Path("orthology_table-68species_ensembl_ids.tsv")
 orthology_table_excel = Path("orthology_table-68species_ensembl_ids.xlsx")
 orthology_table_invalid_suffix = Path("orthology_table-68species_ensembl_ids.foo")
 nonexistent_orthology_table = ""
+tiny_orthology_table = Path("test_orthology_table.csv")
 
 
 def test_class_attributes():
@@ -45,3 +46,15 @@ def test_annotation_names():
     ot = OrthologyTable(orthology_table_csv)
     assert type(ot.get_annotation_names()) == list
     assert len(ot.get_annotation_names()) == 68
+
+
+def test_add_taxonomy_class_to_df():
+    ot = OrthologyTable(tiny_orthology_table)
+    gs = ot.create_genomes_for_species_in_table()
+    ot = ot.add_taxonomy_class_to_df(gs)
+    assert ot.orthology_taxonomy_df["class"].isna().sum() == 0
+    new_df_shape = ot.orthology_df.shape[::-1]
+    new_df_shape = list(new_df_shape)
+    new_df_shape[1] += 1
+    new_df_shape = tuple(new_df_shape)
+    assert ot.orthology_taxonomy_df.shape == new_df_shape
