@@ -15,6 +15,7 @@ class OrthologyTable:
     def __init__(self, path_to_orthology_table):
         self.table_file = path_to_orthology_table
         self.orthology_df = self.parse_orthology_table()
+        self.orthology_taxonomy_df = None
 
     @classmethod
     def file_exists(cls, file):
