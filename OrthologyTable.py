@@ -1,6 +1,15 @@
 from pathlib import Path
 import pandas as pd
 
+from hidden_genes_phd.Genome import Genome
+
+known_problematic_annotation_names = {
+    "heterocephalus_glaber": "heterocephalus_glaber_female",
+    "gorilla_gorilla_gorilla": "gorilla_gorilla",
+    "cricetulus_griseus": "cricetulus_griseus_chok1gshd",
+    "ovis_aries": "ovis_aries_rambouillet",
+}
+
 
 class OrthologyTable:
     def __init__(self, path_to_orthology_table):
@@ -54,4 +63,16 @@ class OrthologyTable:
                 annotation
             ].get_species_class()
 
-        return transposed_orthology_table
+        self.orthology_taxonomy_df = transposed_orthology_table
+        return self
+
+    def create_genomes_for_species_in_table(self):
+        annotation_names = self.get_annotation_names()
+
+        for annotation in annotation_names:
+            if annotation in known_problematic_annotation_names:
+                Genome(annotation, known_problematic_annotation_names[annotation])
+            else:
+                Genome(annotation, annotation)
+
+        return Genome.genomes_dict
