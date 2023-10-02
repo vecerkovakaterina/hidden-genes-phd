@@ -1,7 +1,9 @@
 from pathlib import Path
+
 import pandas as pd
 
-from hidden_genes_phd.Genome import Genome
+from Genome import Genome
+from OrthologyGroup import OrthologyGroup
 
 known_problematic_annotation_names = {
     "heterocephalus_glaber": "heterocephalus_glaber_female",
@@ -77,3 +79,10 @@ class OrthologyTable:
                 Genome(annotation, annotation)
 
         return Genome.genomes_dict
+
+    def create_orthology_groups(self):
+        OrthologyGroup.max_orthologs = self.orthology_df.shape[1]
+        for index, row in self.orthology_df.iterrows():
+            OrthologyGroup(row.dropna().values.tolist())
+
+        return OrthologyGroup.orthology_groups_list
