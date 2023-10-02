@@ -21,6 +21,7 @@ class Genome:
     genomes_dict = {}
 
     def __init__(self, species_name, annotation_name):
+        self.taxonomy_class = None
         self.species_name = species_name
         self.annotation_name = annotation_name
         self.ftp_link = None
@@ -64,7 +65,6 @@ class Genome:
         )
         classes = ["Mammalia", "Aves", "Reptilia", "Actinopteri", "Amphibia"]
 
-        # TODO better parse json response
         for taxon in classes:
             if taxon in ens_api_response:
                 self.taxonomy_class = taxon
