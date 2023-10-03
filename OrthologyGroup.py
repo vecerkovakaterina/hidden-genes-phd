@@ -22,18 +22,20 @@ class OrthologyGroup:
         self.score = None
         OrthologyGroup.orthology_groups_list.append(self)
 
-    def score(self, ortho_table, taxon=None):
-        max_orthologs = len(ortho_table.orthology_taxonomy_df.columns) - 1
+    def calculate_score(self, orthology_table, taxon=None):
+        max_orthologs = get_max_size_orthology_group(orthology_table)
 
         for i, og in enumerate(self.orthology_groups_list):
             og.score = len(og.orthologs) / max_orthologs
             if taxon:
                 og.score += taxon_score(i, ortho_table, taxon)
 
-    def delete_full(self):
-        # TODO delete ogs with all orthologs
-        pass
+    def delete_full_groups(self, orthology_table):
+        max_orthologs = get_max_size_orthology_group(orthology_table)
+        for og in self.orthology_groups_list:
+            if len(og.orthologs) == max_orthologs:
+                self.orthology_groups_list.remove(og)
 
-    def rank(self):
-        # TODO return list of ogs ranked by score
-        pass
+    @classmethod
+    def rank_groups_by_score(cls):
+        cls.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
