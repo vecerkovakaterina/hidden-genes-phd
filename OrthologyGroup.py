@@ -14,6 +14,10 @@ def get_max_possible_score(ortho_table_taxon, taxon=None):
     return full_orthology_group
 
 
+def get_max_size_orthology_group(orthology_table):
+    return len(orthology_table.orthology_taxonomy_df.columns) - 1
+
+
 class OrthologyGroup:
     orthology_groups_list = []
 
