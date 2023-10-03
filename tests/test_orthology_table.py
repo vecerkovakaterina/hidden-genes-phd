@@ -41,13 +41,13 @@ def test_parse_orthology_table():
 def test_species_list():
     ot = OrthologyTable(orthology_table_csv)
     assert type(ot.get_species_list()) == list
-    assert len(ot.get_species_list()) == 68
+    assert len(ot.get_species_list()) == len(ot.orthology_df.columns)
 
 
 def test_annotation_names():
     ot = OrthologyTable(orthology_table_csv)
     assert type(ot.get_annotation_names()) == list
-    assert len(ot.get_annotation_names()) == 68
+    assert len(ot.get_annotation_names()) == len(ot.orthology_df.columns)
 
 
 def test_add_taxonomy_class_to_df():
