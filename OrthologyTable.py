@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from Genome import Genome
-from OrthologyGroup import OrthologyGroup
+from hidden_genes_phd.Genome import Genome
+from hidden_genes_phd.OrthologyGroup import OrthologyGroup
 
 known_problematic_annotation_names = {
     "heterocephalus_glaber": "heterocephalus_glaber_female",
