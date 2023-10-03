@@ -1,4 +1,6 @@
+from hidden_genes_phd.OrthologyGroup import OrthologyGroup
 from hidden_genes_phd.OrthologyTable import OrthologyTable
+from hidden_genes_phd.Genome import Genome
 from pathlib import Path
 import pytest
 
@@ -58,3 +60,19 @@ def test_add_taxonomy_class_to_df():
     new_df_shape[1] += 1
     new_df_shape = tuple(new_df_shape)
     assert ot.orthology_taxonomy_df.shape == new_df_shape
+
+
+def test_create_genomes_for_species_in_table():
+    ot = OrthologyTable(tiny_orthology_table)
+    gs = ot.create_genomes_for_species_in_table()
+    assert len(gs) == len(ot.orthology_df.index)
+    for name, obj in gs.items():
+        assert isinstance(obj, Genome)
+
+
+def test_create_orthology_groups():
+    ot = OrthologyTable(tiny_orthology_table)
+    ogs = ot.create_orthology_groups()
+    assert len(ogs) == len(ot.orthology_df.columns)
+    for og in ogs:
+        assert isinstance(og, OrthologyGroup)
