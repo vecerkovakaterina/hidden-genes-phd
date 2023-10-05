@@ -1,17 +1,15 @@
 from pathlib import Path
-import pandas as pd
+import polars as pl
 from hidden_genes_phd.OrthologyGroup import OrthologyGroup, get_max_possible_score
 from hidden_genes_phd.OrthologyTable import OrthologyTable
 
 orthology_table_file = Path("test_orthology_table.csv")
 orthology_table = OrthologyTable(orthology_table_file)
 
-orthology_taxonomy_df = pd.DataFrame(
-    [["A1", "B1"], ["A2", None], ["Mammalia", "Aves"]]
-).T
+orthology_taxonomy_df = pl.DataFrame([["A1", "B1"], ["A2", None], ["Mammalia", "Aves"]])
 
 orthology_table.orthology_taxonomy_df = orthology_taxonomy_df
-orthology_table.orthology_taxonomy_df.columns = [0, 1, "class"]
+orthology_table.orthology_taxonomy_df.columns = ["0", "1", "class"]
 
 orthology_group_1 = OrthologyGroup(["A1", "B1"])
 orthology_group_2 = OrthologyGroup(["B2"])

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import pandas as pd
+import polars as pl
 
 from hidden_genes_phd.Genome import Genome
 from hidden_genes_phd.OrthologyGroup import OrthologyGroup
@@ -27,15 +27,17 @@ class OrthologyTable:
         if self.file_exists(self.table_file):
             suffix = Path(self.table_file).suffix
             if suffix == ".csv":
-                return pd.read_csv(
-                    self.table_file, sep=",", header=0, index_col=0, low_memory=False
+                return pl.read_csv(source=self.table_file, has_header=True).drop(
+                    columns=""
                 )
             elif suffix == ".tsv":
-                return pd.read_csv(
-                    self.table_file, sep="\t", header=0, index_col=0, low_memory=False
-                )
+                return pl.read_csv(
+                    source=self.table_file, separator="\t", has_header=True
+                ).drop(columns="")
             elif suffix == ".xlsx":
-                return pd.read_excel(self.table_file, header=0, index_col=0)
+                return pl.read_excel(
+                    source=self.table_file, read_csv_options={"has_header": True}
+                ).drop(columns="")
             else:
                 raise ValueError(
                     "Invalid orthology table format. Accepted formats .csv, .tsv, .xlsx."
@@ -44,7 +46,7 @@ class OrthologyTable:
             raise FileNotFoundError(f"File {self.table_file} does not exist.")
 
     def get_species_list(self):
-        return self.orthology_df.columns.tolist()
+        return self.orthology_df.columns
 
     def get_annotation_names(self):
         annotation_names = [
@@ -54,17 +56,17 @@ class OrthologyTable:
 
     @classmethod
     def transpose_df(cls, df):
-        return df.transpose()
+        return df.transpose(include_header=True)
 
     def add_taxonomy_class_to_df(self, genomes_dict):
         annotation_names = self.get_annotation_names()
         transposed_orthology_table = OrthologyTable.transpose_df(self.orthology_df)
-        transposed_orthology_table.index = self.get_annotation_names()
 
-        for annotation in annotation_names:
-            transposed_orthology_table.loc[annotation, "class"] = genomes_dict[
-                annotation
-            ].get_species_class()
+        classes = [genomes_dict[name].get_species_class() for name in annotation_names]
+
+        transposed_orthology_table = transposed_orthology_table.with_columns(
+            pl.Series(name="class", values=classes)
+        )
 
         self.orthology_taxonomy_df = transposed_orthology_table
         return self
@@ -82,7 +84,7 @@ class OrthologyTable:
 
     def create_orthology_groups(self):
         OrthologyGroup.max_orthologs = self.orthology_df.shape[1]
-        for index, row in self.orthology_df.iterrows():
-            OrthologyGroup(row.dropna().values.tolist())
+        for row in self.orthology_df.rows():
+            OrthologyGroup(list(row))
 
         return OrthologyGroup.orthology_groups_list

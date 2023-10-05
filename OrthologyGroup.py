@@ -1,17 +1,30 @@
+import polars as pl
+
+
 def taxon_score(col, orthology_table, taxon):
-    species_in_taxon_df = orthology_table.orthology_taxonomy_df.loc[
-        orthology_table.orthology_taxonomy_df["class"] == taxon
-    ].copy()
-    return species_in_taxon_df[col].notna().sum()
+    nans_in_taxon = (
+        orthology_table.orthology_taxonomy_df.filter(pl.col("class") == taxon)
+        .select(str(orthology_table.orthology_taxonomy_df.columns[col]))
+        .null_count()
+        .item()
+    )
+    species_in_taxon = (
+        orthology_table.orthology_taxonomy_df.filter(pl.col("class") == taxon)
+        .select(str(orthology_table.orthology_taxonomy_df.columns[col]))
+        .select(pl.count())
+        .item()
+    )
+    orthologs_in_taxon = species_in_taxon - nans_in_taxon
+    return orthologs_in_taxon
 
 
 def get_max_possible_score(orthology_table, taxon=None):
     full_orthology_group = 1.0
     if taxon:
-        full_orthology_group += len(
-            orthology_table.orthology_taxonomy_df.loc[
-                orthology_table.orthology_taxonomy_df["class"] == taxon
-            ].index
+        full_orthology_group += (
+            orthology_table.orthology_taxonomy_df.filter(pl.col("class") == taxon)
+            .select(pl.count())
+            .item()
         )
     return full_orthology_group
 
@@ -32,7 +45,8 @@ class OrthologyGroup:
         max_orthologs = get_max_size_orthology_group(orthology_table)
 
         for i, og in enumerate(self.orthology_groups_list):
-            og.score = len(og.orthologs) / max_orthologs
+            number_orthologs = len([x for x in og.orthologs if str(x) != "nan"])
+            og.score = number_orthologs / max_orthologs
             if taxon:
                 og.score += taxon_score(i, orthology_table, taxon)
 
