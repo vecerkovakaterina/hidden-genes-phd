@@ -1,3 +1,4 @@
 genomes/*
 orthology_table-68species_ensembl_ids*
 test_orthology_table.csv
+.idea
