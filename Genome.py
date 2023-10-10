@@ -1,10 +1,12 @@
-import gget
-import pathlib
-import urllib.request
 import gzip
-import shutil
-import requests
 import json
+import pathlib
+import shutil
+import urllib.request
+
+import gget
+import requests
+
 from hidden_genes_phd.Annotation import Annotation
 
 
