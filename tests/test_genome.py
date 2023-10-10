@@ -1,6 +1,7 @@
 from hidden_genes_phd.Genome import Genome
 from pathlib import Path
 import pytest
+from hidden_genes_phd.Annotation import Annotation
 
 valid_annotation_name = "heterocephalus_glaber_female"
 invalid_annotation_name = "heterocephalus_glaber"
@@ -47,6 +48,9 @@ def test_annotation_name_exists():
         is True
     )
     with pytest.raises(ValueError):
-        Genome(
-            invalid_annotation_name, invalid_annotation_name
-        ).annotation_name_exists()
+        Genome(invalid_annotation_name, invalid_annotation_name)
+
+
+def test_create_annotation_object():
+    g = Genome(valid_annotation_name, valid_annotation_name)
+    assert isinstance(g.annotation, Annotation) is True
