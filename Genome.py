@@ -5,6 +5,7 @@ import gzip
 import shutil
 import requests
 import json
+from hidden_genes_phd.Annotation import Annotation
 
 
 def access_ensembl_api(ext):
@@ -25,8 +26,10 @@ class Genome:
         self.species_name = species_name
         self.annotation_name = annotation_name
         self.ftp_link = None
-        self.genome_file = pathlib.Path("genomes/", self.species_name + ".gtf")
+        self.annotation_file = pathlib.Path("genomes", self.species_name + ".gtf")
+        self.annotation = None
         self.download_annotation()
+        self.create_annotation_object()
         Genome.genomes_dict[self.species_name] = self
 
     @classmethod
@@ -57,7 +60,12 @@ class Genome:
         if not self.annotation_downloaded():
             gtf_gz = pathlib.Path("genomes", self.annotation_name + ".gtf.gz")
             urllib.request.urlretrieve(self.ftp_link, gtf_gz)
-            self.unpack_gz(gtf_gz, self.genome_file)
+            self.unpack_gz(gtf_gz, self.annotation_file)
+
+    def create_annotation_object(self):
+        annotation = Annotation(self.annotation_file)
+        if annotation.gtf_file_exists():
+            self.annotation = annotation
 
     def get_species_class(self):
         ens_api_response = access_ensembl_api(
