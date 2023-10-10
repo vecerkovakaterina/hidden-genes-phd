@@ -9,12 +9,13 @@ def is_gtf_header_line(line):
 
 class Annotation:
     def __init__(self, gtf_file):
-        self.gtf_file = Path("genomes", gtf_file)
+        self.gtf_file = gtf_file
         self.df = None
 
-        self.gtf_to_df()
-        self.filter_only_genes()
-        self.sort_df_by_coordinates()
+        if self.gtf_file_exists():
+            self.gtf_to_df()
+            self.filter_only_genes()
+            self.sort_df_by_coordinates()
 
     def gtf_file_exists(self):
         return self.gtf_file.exists()
