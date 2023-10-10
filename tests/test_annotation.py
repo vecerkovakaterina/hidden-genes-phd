@@ -15,9 +15,15 @@ def test_gtf_file_exists():
 
 
 def test_gtf_count_header_lines():
-    assert Annotation("cavia_porcellus.gtf").gtf_count_header_lines() == 5
-    assert Annotation("maylandia_zebra.gtf").gtf_count_header_lines() == 5
-    assert Annotation("octodon_degus.gtf").gtf_count_header_lines() == 5
+    assert (
+        Annotation(Path("genomes", "cavia_porcellus.gtf")).gtf_count_header_lines() == 5
+    )
+    assert (
+        Annotation(Path("genomes", "maylandia_zebra.gtf")).gtf_count_header_lines() == 5
+    )
+    assert (
+        Annotation(Path("genomes", "octodon_degus.gtf")).gtf_count_header_lines() == 5
+    )
 
 
 def test_gtf_to_df():
