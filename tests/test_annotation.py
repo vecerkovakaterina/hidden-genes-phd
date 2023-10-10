@@ -24,13 +24,3 @@ def test_gtf_to_df():
     an = Annotation(test_gtf)
     assert isinstance(an.gtf_to_df(), Annotation)
     assert an.df.is_empty() is False
-
-
-def test_sort_df_by_coordinates():
-    # TODO
-    pass
-
-
-def test_filter_only_genes():
-    # TODO
-    pass
