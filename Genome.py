@@ -42,9 +42,12 @@ class Genome:
 
     def annotation_name_exists(self):
         try:
-            gget.ref(self.annotation_name, which=["gtf"], release=self.ensembl_release)[
-                self.annotation_name
-            ]["annotation_gtf"]["ftp"]
+            gget.ref(
+                self.annotation_name,
+                which=["gtf"],
+                release=self.ensembl_release,
+                verbose=False,
+            )[self.annotation_name]["annotation_gtf"]["ftp"]
         except ValueError:
             raise ValueError(f"Invalid annotation name: {self.annotation_name}")
         else:
@@ -56,7 +59,9 @@ class Genome:
     def download_annotation(self):
         if self.annotation_name_exists():
             self.ftp_link = gget.ref(
-                self.annotation_name, which=["gtf"], release=self.ensembl_release
+                self.annotation_name,
+                which=["gtf"],
+                release=self.ensembl_release,
             )[self.annotation_name]["annotation_gtf"]["ftp"]
 
         if not self.annotation_downloaded():
