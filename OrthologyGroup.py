@@ -1,4 +1,11 @@
 import polars as pl
+import gget
+from pathlib import Path
+import subprocess
+
+
+def drop_nans_form_list(lst):
+    return [x for x in lst if x != "nan"]
 
 
 def taxon_score(col, orthology_table, taxon):
@@ -39,6 +46,7 @@ class OrthologyGroup:
     def __init__(self, orthologs):
         self.orthologs = orthologs
         self.score = None
+        self.sequences_fasta = None
         OrthologyGroup.orthology_groups_list.append(self)
 
     def calculate_score(self, orthology_table, taxon=None):
@@ -59,3 +67,44 @@ class OrthologyGroup:
     @classmethod
     def rank_groups_by_score(cls):
         cls.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
+
+    def create_ortholog_sequences_list(self):
+        orthologs = drop_nans_form_list(self.orthologs)
+        ortholog_aa_sequences = []
+        for ortholog in orthologs:
+            try:
+                sequence = gget.seq(ortholog, translate=True, verbose=False)
+                if len(sequence) > 0:
+                    ortholog_aa_sequences.append(sequence)
+            except TypeError:
+                continue
+
+        return ortholog_aa_sequences
+
+    def write_ortholog_sequences_to_fasta(self):
+        aa_sequences = self.create_ortholog_sequences_list()
+        aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])
+        aa_sequences_file = Path(
+            "ortholog_sequences",
+            f"{'_'.join(drop_nans_form_list(self.orthologs)) + '.fa'}",
+        )
+
+        with open(aa_sequences_file, "w") as fasta_file:
+            fasta_file.write(aa_sequences)
+
+        self.sequences_fasta = aa_sequences_file
+
+    def fasta_to_custom_blast_db(self):
+        command = f"makeblastdb -in {self.sequences_fasta} -parse_seqids -dbtype prot"
+        result = subprocess.run(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise Exception(
+                f"Error when creating custom BLAST db: {self.sequences_fasta}!"
+            )
