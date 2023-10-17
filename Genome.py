@@ -10,13 +10,6 @@ import requests
 from hidden_genes_phd.Annotation import Annotation
 
 
-def access_ensembl_api(ext):
-    server = "https://rest.ensembl.org"
-    response = requests.get(server + ext, headers={"Content-Type": "application/json"})
-    response = json.dumps(response.json())
-    return response
-
-
 class Genome:
     kind = "vertebrate"
     ensembl_release = 109
@@ -33,6 +26,15 @@ class Genome:
         self.download_annotation()
         self.create_annotation_object()
         Genome.genomes_dict[self.species_name] = self
+
+    @staticmethod
+    def access_ensembl_api(ext):
+        server = "https://rest.ensembl.org"
+        response = requests.get(
+            server + ext, headers={"Content-Type": "application/json"}
+        )
+        response = json.dumps(response.json())
+        return response
 
     @classmethod
     def unpack_gz(cls, gzip_file, output_file):
@@ -75,7 +77,7 @@ class Genome:
             self.annotation = annotation
 
     def get_species_class(self):
-        ens_api_response = access_ensembl_api(
+        ens_api_response = self.access_ensembl_api(
             f"/taxonomy/classification/{self.species_name}?"
         )
         classes = ["Mammalia", "Aves", "Reptilia", "Actinopteri", "Amphibia"]
