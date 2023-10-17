@@ -4,10 +4,6 @@ from pathlib import Path
 import polars as pl
 
 
-def is_gtf_header_line(line):
-    return line.startswith("#")
-
-
 class Annotation:
     def __init__(self, gtf_file):
         self.gtf_file = gtf_file
@@ -18,13 +14,17 @@ class Annotation:
             self.filter_only_genes()
             self.sort_df_by_coordinates()
 
+    @staticmethod
+    def is_gtf_header_line(line):
+        return line.startswith("#")
+
     def gtf_file_exists(self):
         return self.gtf_file.exists()
 
     def gtf_count_header_lines(self):
         no_header_lines = 0
         with open(self.gtf_file, "r") as gtf:
-            while is_gtf_header_line(gtf.readline()):
+            while self.is_gtf_header_line(gtf.readline()):
                 no_header_lines += 1
         return no_header_lines
 
