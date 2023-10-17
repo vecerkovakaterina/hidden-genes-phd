@@ -83,8 +83,11 @@ class OrthologyTable:
         return Genome.genomes_dict
 
     def create_orthology_groups(self):
-        OrthologyGroup.max_orthologs = self.orthology_df.shape[1]
         for row in self.orthology_df.rows():
-            OrthologyGroup(list(row))
+            nans_indeces = [i for i in range(len(row)) if row[i] == "nan"]
+            species = self.get_annotation_names()
+            for nan in sorted(nans_indeces, reverse=True):
+                del species[nan]
+            OrthologyGroup(row, species)
 
         return OrthologyGroup.orthology_groups_list
