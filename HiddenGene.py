@@ -1,7 +1,8 @@
+from collections import Counter
+
 import polars as pl
 
 from hidden_genes_phd.OrthologyGroup import OrthologyGroup
-from collections import Counter
 
 
 class HiddenGene:
@@ -35,7 +36,7 @@ class HiddenGene:
             orthologs = OrthologyGroup.drop_nans_from_list(
                 self.orthology_group.orthologs
             )
-            find_ortholog_in_annotation = pl.col("attribute").str.contains(orthologs[i])
+            find_ortholog_in_annotation = pl.col("ensembl_id") == orthologs[i]
             index_of_ortholog_in_annotation = (
                 genomes[species]
                 .annotation.df.filter(find_ortholog_in_annotation)
