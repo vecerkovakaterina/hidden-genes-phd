@@ -1,7 +1,5 @@
-import subprocess
-from pathlib import Path
-
 import polars as pl
+import re
 
 
 class Annotation:
@@ -13,6 +11,8 @@ class Annotation:
             self.gtf_to_df()
             self.filter_only_genes()
             self.sort_df_by_coordinates()
+            self.add_rownumbers_to_df()
+            self.extract_ensembl_ids()
 
     @staticmethod
     def is_gtf_header_line(line):
@@ -27,6 +27,12 @@ class Annotation:
             while self.is_gtf_header_line(gtf.readline()):
                 no_header_lines += 1
         return no_header_lines
+
+    def add_rownumbers_to_df(self):
+        number_of_rows = self.df.select(pl.count()).item()
+        indeces = list(range(number_of_rows))
+        self.df = self.df.with_columns(pl.Series(name="index", values=indeces))
+        return self
 
     def gtf_to_df(self):
         df = pl.read_csv(
@@ -67,3 +73,14 @@ class Annotation:
     def filter_only_genes(self):
         self.df = self.df.filter(pl.col("feature") == "gene")
         return self
+
+    def extract_ensembl_ids(self):
+        ensembl_ids = []
+        for row in self.df.rows(named=True):
+            match = re.search('gene_id "(.+?)";', row["attribute"])
+            if match:
+                ensembl_id = match.group(1)
+            else:
+                ensembl_id = "unknown"
+            ensembl_ids.append(ensembl_id)
+        self.df = self.df.with_columns(pl.Series(name="ensembl_id", values=ensembl_ids))
