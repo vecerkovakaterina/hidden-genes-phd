@@ -21,7 +21,7 @@ class Genome:
         self.species_name = species_name
         self.annotation_name = annotation_name
         self.ftp_link = None
-        self.annotation_file = pathlib.Path("genomes", self.species_name + ".gtf")
+        self.annotation_file = pathlib.Path("genomes", self.annotation_name + ".gtf")
         self.annotation = None
         self.download_annotation()
         self.create_annotation_object()
