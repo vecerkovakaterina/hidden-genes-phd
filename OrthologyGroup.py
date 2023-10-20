@@ -14,6 +14,14 @@ class OrthologyGroup:
         self.sequences_fasta = None
         OrthologyGroup.orthology_groups_list.append(self)
 
+    def __hash__(self):
+        return hash(tuple(self.orthologs))
+
+    def __eq__(self, other):
+        if isinstance(other, OrthologyGroup):
+            return self.orthologs == other.orthologs
+        return False
+
     @staticmethod
     def drop_nans_from_list(lst):
         return [x for x in lst if str(x) != "nan"]
