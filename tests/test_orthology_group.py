@@ -1,5 +1,7 @@
 from pathlib import Path
+
 import polars as pl
+
 from hidden_genes_phd.OrthologyGroup import OrthologyGroup
 from hidden_genes_phd.OrthologyTable import OrthologyTable
 

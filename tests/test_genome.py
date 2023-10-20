@@ -1,7 +1,9 @@
-from hidden_genes_phd.Genome import Genome
 from pathlib import Path
+
 import pytest
+
 from hidden_genes_phd.Annotation import Annotation
+from hidden_genes_phd.Genome import Genome
 
 valid_annotation_name = "heterocephalus_glaber_female"
 invalid_annotation_name = "heterocephalus_glaber"

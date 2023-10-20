@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from hidden_genes_phd.Annotation import Annotation
 
 test_gtf = Path("genomes", "homo_sapiens.gtf")

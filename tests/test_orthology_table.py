@@ -1,9 +1,11 @@
+from pathlib import Path
+
+import polars as pl
+import pytest
+
+from hidden_genes_phd.Genome import Genome
 from hidden_genes_phd.OrthologyGroup import OrthologyGroup
 from hidden_genes_phd.OrthologyTable import OrthologyTable
-from hidden_genes_phd.Genome import Genome
-from pathlib import Path
-import pytest
-import polars as pl
 
 orthology_table_csv = Path("orthology_table-68species_ensembl_ids.csv")
 orthology_table_tsv = Path("orthology_table-68species_ensembl_ids.tsv")
