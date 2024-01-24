@@ -91,3 +91,36 @@ class OrthologyTable:
             OrthologyGroup(row, species)
 
         return OrthologyGroup.orthology_groups_list
+
+    def get_species_ortholog_ensmebl_id_from_group(self, genome_name, orthology_group):
+        species_name_table = genome_name.replace("_", " ").capitalize()
+        species_genes = self.orthology_df.get_column(species_name_table).to_list()
+        species_genes = OrthologyGroup.drop_nans_from_list(species_genes)
+        neighbor_orthologs = OrthologyGroup.drop_nans_from_list(
+            orthology_group.orthologs
+        )
+        species_neighbor_ensembl_id = [
+            ensembl_id
+            for ensembl_id in neighbor_orthologs
+            if ensembl_id in species_genes
+        ][0]
+
+        return species_neighbor_ensembl_id
+
+    def get_ensembl_id_of_ortholog_in_species(
+        self, ortholog_ensembl_id, species_with_ortholog, species_interested
+    ):
+        species_with_ortholog = species_with_ortholog.replace("_", " ").capitalize()
+        species_interested = species_interested.replace("_", " ").capitalize()
+        if self.orthology_df.filter(
+            pl.col(species_with_ortholog) == ortholog_ensembl_id
+        ).is_empty():
+            return "nan"
+        else:
+            return (
+                self.orthology_df.filter(
+                    pl.col(species_with_ortholog) == ortholog_ensembl_id
+                )
+                .select(species_interested)
+                .item()
+            )
