@@ -121,6 +121,26 @@ class HiddenGene:
         else:
             return None
 
+    def assign_neighbor_ensembl_id(self, orthology_table):
+        self.left_neighbor = orthology_table.get_species_ortholog_ensmebl_id_from_group(
+            self.missing_from_genome,
+            self.left_neighbor_orthology_group,
+        )
+        self.right_neighbor = (
+            orthology_table.get_species_ortholog_ensmebl_id_from_group(
+                self.missing_from_genome,
+                self.right_neighbor_orthology_group,
+            )
+        )
+
+    def get_coordinates_of_neighbor(self):
+        # TODO
+        pass
+
+    def get_region_between_neighbors(self):
+        # TODO
+        pass
+
     def find_overlapping_annotation(self):
         # TODO
         pass

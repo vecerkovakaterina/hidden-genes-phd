@@ -93,7 +93,7 @@ class OrthologyTable:
         return OrthologyGroup.orthology_groups_list
 
     def get_species_ortholog_ensmebl_id_from_group(self, genome_name, orthology_group):
-        species_name_table = genome_name.replace("_", " ").capitalize()
+        species_name_table = genome_name.species_name.replace("_", " ").capitalize()
         species_genes = self.orthology_df.get_column(species_name_table).to_list()
         species_genes = OrthologyGroup.drop_nans_from_list(species_genes)
         neighbor_orthologs = OrthologyGroup.drop_nans_from_list(
