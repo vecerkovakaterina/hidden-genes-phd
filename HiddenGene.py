@@ -2,7 +2,9 @@ from collections import Counter
 
 import polars as pl
 
+from hidden_genes_phd.Genome import Genome
 from hidden_genes_phd.OrthologyGroup import OrthologyGroup
+from hidden_genes_phd.OrthologyTable import OrthologyTable
 
 
 class HiddenGene:
@@ -15,6 +17,7 @@ class HiddenGene:
         self.left_neighbor_orthology_group = None
         self.right_neighbor = None
         self.right_neighbor_orthology_group = None
+        self.region_between_neighbors = None
         self.coordinates = None
         self.sequence = None
         self.overlaps_with = None
@@ -133,13 +136,94 @@ class HiddenGene:
             )
         )
 
-    def get_coordinates_of_neighbor(self):
-        # TODO
-        pass
+    def get_neighbor_coordinates(self):
+        left_neighbor_coordinates = (
+            self.missing_from_genome.annotation.get_coordinates_by_ensembl_id(
+                self.left_neighbor
+            )
+        )
+        right_neighbor_coordinates = (
+            self.missing_from_genome.annotation.get_coordinates_by_ensembl_id(
+                self.right_neighbor
+            )
+        )
+        return left_neighbor_coordinates, right_neighbor_coordinates
+
+    @staticmethod
+    def combine_left_right_region_sequence(left, right):
+        left = left.split("\n")
+        left_header = left.pop(0)
+        left_sequence = "".join(left)
+
+        right = right.split("\n")
+        right_header = right.pop(0)
+        right_sequence = "".join(right)
+
+        combined_header = left_header + " + " + right_header
+        combined_sequence = left_sequence + "N" + right_sequence
+        combined = combined_header + "\n" + combined_sequence
+        return combined
 
     def get_region_between_neighbors(self):
-        # TODO
-        pass
+        (
+            left_neighbor_coordinates,
+            right_neighbor_coordinates,
+        ) = self.get_neighbor_coordinates()
+
+        left_neighbor_scaffold = Genome.access_ensembl_api(
+            f"/lookup/id/{self.left_neighbor}?expand=1"
+        )["seq_region_name"]
+        right_neighbor_scaffold = Genome.access_ensembl_api(
+            f"/lookup/id/{self.right_neighbor}?expand=1"
+        )["seq_region_name"]
+        scaffold = None
+        if left_neighbor_scaffold == right_neighbor_scaffold:
+            scaffold = left_neighbor_scaffold
+        if scaffold and (left_neighbor_coordinates > right_neighbor_coordinates):
+            tmp = left_neighbor_coordinates
+            left_neighbor_coordinates = right_neighbor_coordinates
+            right_neighbor_coordinates = tmp
+
+        region_start = left_neighbor_coordinates[1]
+        region_end = right_neighbor_coordinates[0]
+
+        if scaffold:
+            region_sequence_response = Genome.access_ensembl_api(
+                f"/sequence/region/{self.missing_from_genome.annotation_name}/{scaffold}:{region_start}..{region_end}?",
+                content_type="text/x-fasta",
+            )
+            if region_sequence_response.text:
+                self.region_between_neighbors = region_sequence_response.text
+
+        else:
+            left_part_response = Genome.access_ensembl_api(
+                f"/sequence/region/{self.missing_from_genome.annotation_name}/{left_neighbor_scaffold}:{region_start}..{region_start+10000000}?",
+                content_type="text/x-fasta",
+            )  # try to get maximum sequence to reach the end of the scaffold
+            if left_part_response.status_code == 400:
+                # TODO retrieve in pieces
+                print("Trying to retrieve region longer than 10 Mbp!")
+            right_part_response = Genome.access_ensembl_api(
+                f"/sequence/region/{self.missing_from_genome.annotation_name}/{right_neighbor_scaffold}:{1}..{region_end}?",
+                content_type="text/x-fasta",
+            )
+            if right_part_response.status_code == 400:
+                # TODO retrieve in pieces
+                print("Trying to retrieve region longer than 10 Mbp!")
+
+            left_part = None
+            right_part = None
+
+            if left_part_response.text.startswith(">"):
+                left_part = left_part_response.text
+            if right_part_response.text.startswith(">"):
+                right_part = right_part_response.text
+
+            if left_part and right_part:
+                region_sequence = self.combine_left_right_region_sequence(
+                    left_part, right_part
+                )
+                self.region_between_neighbors = region_sequence
 
     def find_overlapping_annotation(self):
         # TODO
