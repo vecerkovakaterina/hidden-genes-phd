@@ -3,6 +3,17 @@ import re
 import polars as pl
 
 
+def custom_sort_scaffold_id(item):
+    if item.isdigit():
+        return 0, int(item), None, None
+    elif item.isalpha():
+        return 2, None, item, None
+    else:
+        letters = "".join(c for c in item if c.isalpha())
+        digits = int("".join(c for c in item if c.isdigit()))
+        return 1, None, letters, digits
+
+
 class Annotation:
     def __init__(self, gtf_file):
         self.gtf_file = gtf_file
@@ -68,7 +79,25 @@ class Annotation:
         return self
 
     def sort_df_by_coordinates(self):
-        self.df = self.df.sort(["seqname", "start", "end"])
+        df = self.df.with_columns(
+            [
+                (
+                    pl.col("seqname").apply(lambda x: custom_sort_scaffold_id(x)[1])
+                ).alias("seqname_digit"),
+                (
+                    pl.col("seqname").apply(lambda x: custom_sort_scaffold_id(x)[3])
+                ).alias("seqname_mixed"),
+                (
+                    pl.col("seqname").apply(lambda x: custom_sort_scaffold_id(x)[2])
+                ).alias("seqname_alpha"),
+            ]
+        )
+
+        self.df = df.sort(
+            ["seqname_digit", "seqname_mixed", "seqname_alpha", "start", "end"],
+            nulls_last=True,
+        )
+        self.df.drop(["seqname_digit", "seqname_mixed", "seqname_alpha"])
         return self
 
     def filter_only_genes(self):
@@ -85,3 +114,10 @@ class Annotation:
                 ensembl_id = "unknown"
             ensembl_ids.append(ensembl_id)
         self.df = self.df.with_columns(pl.Series(name="ensembl_id", values=ensembl_ids))
+
+    def get_coordinates_by_ensembl_id(self, id):
+        start = (
+            self.df.filter(pl.col("ensembl_id") == id).select(pl.col("start")).item()
+        )
+        end = self.df.filter(pl.col("ensembl_id") == id).select(pl.col("end")).item()
+        return start, end
