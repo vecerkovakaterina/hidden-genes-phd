@@ -28,12 +28,11 @@ class Genome:
         Genome.genomes_dict[self.species_name] = self
 
     @staticmethod
-    def access_ensembl_api(ext):
+    def access_ensembl_api(ext, content_type="application/json"):
         server = "https://rest.ensembl.org"
-        response = requests.get(
-            server + ext, headers={"Content-Type": "application/json"}
-        )
-        response = json.dumps(response.json())
+        response = requests.get(server + ext, headers={"Content-Type": content_type})
+        if "json" in content_type:
+            response = response.json()
         return response
 
     @classmethod
@@ -77,9 +76,10 @@ class Genome:
             self.annotation = annotation
 
     def get_species_class(self):
-        ens_api_response = self.access_ensembl_api(
-            f"/taxonomy/classification/{self.species_name}?"
+        ens_api_response = json.dumps(
+            self.access_ensembl_api(f"/taxonomy/classification/{self.species_name}?")
         )
+
         classes = ["Mammalia", "Aves", "Reptilia", "Actinopteri", "Amphibia"]
 
         for taxon in classes:
