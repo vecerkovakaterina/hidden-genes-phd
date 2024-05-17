@@ -225,6 +225,23 @@ class HiddenGene:
                 )
                 self.region_between_neighbors = region_sequence
 
+    def write_region_sequence_to_fasta(self):
+        if self.region_between_neighbors:
+            region_sequence_fasta_filename = Path(
+                "regions_to_search",
+                "_".join(
+                    [
+                        self.missing_from_genome.species_name,
+                        self.left_neighbor,
+                        self.right_neighbor,
+                    ]
+                ),
+            )
+            if not region_sequence_fasta_filename.is_file():
+                with open(region_sequence_fasta_filename, "w") as fasta_file:
+                    fasta_file.write(self.region_between_neighbors)
+                self.region_between_neighbors_fasta = region_sequence_fasta_filename
+
     def find_overlapping_annotation(self):
         # TODO
         pass
