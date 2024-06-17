@@ -7,16 +7,14 @@ import urllib.request
 import gget
 import requests
 
-from hidden_genes_phd.Annotation import Annotation
+from Annotation import Annotation
 
 
 class Genome:
     kind = "vertebrate"
     ensembl_release = 109
 
-    genomes_dict = {}
-
-    def __init__(self, species_name, annotation_name):
+    def __init__(self, species_name, annotation_name, genomes):
         self.taxonomy_class = None
         self.species_name = species_name
         self.annotation_name = annotation_name
@@ -25,7 +23,7 @@ class Genome:
         self.annotation = None
         self.download_annotation()
         self.create_annotation_object()
-        Genome.genomes_dict[self.species_name] = self
+        genomes.genomes_dict[self.species_name] = self
 
     @staticmethod
     def access_ensembl_api(ext, content_type="application/json"):
