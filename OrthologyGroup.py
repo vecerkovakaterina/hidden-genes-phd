@@ -6,14 +6,12 @@ import polars as pl
 
 
 class OrthologyGroup:
-    orthology_groups_list = []
-
-    def __init__(self, orthologs, species_with_ortholog):
+    def __init__(self, orthologs, species_with_ortholog, orthology_groups):
         self.orthologs = orthologs
         self.species_with_ortholog = species_with_ortholog
         self.score = None
         self.sequences_fasta = None
-        OrthologyGroup.orthology_groups_list.append(self)
+        orthology_groups.orthology_groups_list.append(self)
 
     def __hash__(self):
         return hash(tuple(self.orthologs))
@@ -70,27 +68,27 @@ class OrthologyGroup:
     #     for i, group in enumerate(self.orthology_groups_list):
     #         group.calculate_score(orthology_table, i, taxon)
 
-    def calculate_score_all_groups(self, orthology_table, taxon=None):
+    def calculate_score_all_groups(self, orthology_table, orthology_groups, taxon=None):
         max_orthologs = self.get_max_size_orthology_group(orthology_table)
 
-        for i, og in enumerate(self.orthology_groups_list):
+        for i, og in enumerate(orthology_groups.orthology_groups_list):
             number_orthologs = len(self.drop_nans_from_list(og.orthologs))
             og.score = number_orthologs / max_orthologs
             if taxon:
                 og.score += self.taxon_score(i, orthology_table, taxon)
 
-    def delete_full_groups(self, orthology_table):
+    def delete_full_groups(self, orthology_table, orthology_groups):
         max_orthologs = self.get_max_size_orthology_group(orthology_table)
-        for orthology_group in self.orthology_groups_list:
+        for orthology_group in orthology_groups.orthology_groups_list:
             orthologs = OrthologyGroup.drop_nans_from_list(orthology_group.orthologs)
             if len(orthologs) == max_orthologs:
                 # delete instance with no missing orthologs
-                self.orthology_groups_list.remove(orthology_group)
+                orthology_groups.orthology_groups_list.remove(orthology_group)
                 del orthology_group
 
     @classmethod
-    def rank_groups_by_score(cls):
-        cls.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
+    def rank_groups_by_score(cls, orthology_groups):
+        orthology_groups.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
 
     def create_ortholog_sequences_list(self):
         orthologs = self.drop_nans_from_list(self.orthologs)

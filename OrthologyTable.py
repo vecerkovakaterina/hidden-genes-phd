@@ -2,8 +2,9 @@ from pathlib import Path
 
 import polars as pl
 
-from hidden_genes_phd.Genome import Genome
-from hidden_genes_phd.OrthologyGroup import OrthologyGroup
+from Genome import Genome
+from OrthologyGroup import OrthologyGroup
+from Genomes import Genomes
 
 known_problematic_annotation_names = {
     "heterocephalus_glaber": "heterocephalus_glaber_female",
@@ -58,11 +59,13 @@ class OrthologyTable:
     def transpose_df(cls, df):
         return df.transpose(include_header=True)
 
-    def add_taxonomy_class_to_df(self, genomes_dict):
+    def add_taxonomy_class_to_df(self, genomes):
         annotation_names = self.get_annotation_names()
         transposed_orthology_table = OrthologyTable.transpose_df(self.orthology_df)
 
-        classes = [genomes_dict[name].get_species_class() for name in annotation_names]
+        classes = [
+            genomes.genomes_dict[name].get_species_class() for name in annotation_names
+        ]
 
         transposed_orthology_table = transposed_orthology_table.with_columns(
             pl.Series(name="class", values=classes)
@@ -71,26 +74,24 @@ class OrthologyTable:
         self.orthology_taxonomy_df = transposed_orthology_table
         return self
 
-    def create_genomes_for_species_in_table(self):
+    def create_genomes_for_species_in_table(self, genomes):  # TODO check
         annotation_names = self.get_annotation_names()
 
         for annotation in annotation_names:
             if annotation in known_problematic_annotation_names:
-                Genome(annotation, known_problematic_annotation_names[annotation])
+                Genome(
+                    annotation, known_problematic_annotation_names[annotation], genomes
+                )
             else:
-                Genome(annotation, annotation)
+                Genome(annotation, annotation, genomes)
 
-        return Genome.genomes_dict
-
-    def create_orthology_groups(self):
+    def create_orthology_groups(self, orthology_groups):
         for row in self.orthology_df.rows():
             nans_indeces = [i for i in range(len(row)) if row[i] == "nan"]
             species = self.get_annotation_names()
             for nan in sorted(nans_indeces, reverse=True):
                 del species[nan]
-            OrthologyGroup(row, species)
-
-        return OrthologyGroup.orthology_groups_list
+            OrthologyGroup(row, species, orthology_groups)
 
     def get_species_ortholog_ensmebl_id_from_group(self, genome_name, orthology_group):
         species_name_table = genome_name.species_name.replace("_", " ").capitalize()

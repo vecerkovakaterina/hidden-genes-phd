@@ -3,9 +3,10 @@ from pathlib import Path
 import polars as pl
 import pytest
 
-from hidden_genes_phd.Genome import Genome
-from hidden_genes_phd.OrthologyGroup import OrthologyGroup
-from hidden_genes_phd.OrthologyTable import OrthologyTable
+from Genome import Genome
+from OrthologyGroup import OrthologyGroup
+from OrthologyTable import OrthologyTable
+from Genomes import Genomes
 
 orthology_table_csv = Path("orthology_table-68species_ensembl_ids.csv")
 orthology_table_tsv = Path("orthology_table-68species_ensembl_ids.tsv")
@@ -55,7 +56,8 @@ def test_annotation_names():
 
 def test_add_taxonomy_class_to_df():
     ot = OrthologyTable(tiny_orthology_table)
-    gs = ot.create_genomes_for_species_in_table()
+    gs = Genomes()
+    ot.create_genomes_for_species_in_table(gs)
     ot = ot.add_taxonomy_class_to_df(gs)
     assert ot.orthology_taxonomy_df.null_count().select("class").item() == 0
     new_df_shape = ot.orthology_df.shape[::-1]
@@ -67,9 +69,10 @@ def test_add_taxonomy_class_to_df():
 
 def test_create_genomes_for_species_in_table():
     ot = OrthologyTable(tiny_orthology_table)
-    gs = ot.create_genomes_for_species_in_table()
-    assert len(gs) == ot.orthology_df.select(pl.count()).item()
-    for name, obj in gs.items():
+    gs = Genomes()
+    ot.create_genomes_for_species_in_table(gs)
+    assert len(gs.genomes_dict) == ot.orthology_df.select(pl.count()).item()
+    for name, obj in gs.genomes_dict.items():
         assert isinstance(obj, Genome)
 
 
