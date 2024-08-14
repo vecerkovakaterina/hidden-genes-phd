@@ -69,7 +69,7 @@ class OrthologyGroup:
             return False
 
     def create_ortholog_sequences_list(self):
-        orthologs = self.drop_nans_from_list(self.orthologs)
+        orthologs = self.drop_nans_from_orthologs_list()
         ortholog_aa_sequences = []
         for ortholog in orthologs:
             try:
@@ -84,7 +84,7 @@ class OrthologyGroup:
     def write_ortholog_sequences_to_fasta(self):
         aa_sequences_filename = Path(
             "ortholog_sequences",
-            f"{'_'.join(self.drop_nans_from_list(self.orthologs)) + '.fa'}",
+            f"{'_'.join(self.drop_nans_from_orthologs_list()) + '.fa'}",
         )
         if not aa_sequences_filename.is_file():
             # check if file exists already

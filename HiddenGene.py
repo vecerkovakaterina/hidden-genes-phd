@@ -41,9 +41,7 @@ class HiddenGene:
         self.validate_side(side=side)
         neighbors_lists = []
         for i, species in enumerate(self.orthology_group.species_with_ortholog):
-            orthologs = OrthologyGroup.drop_nans_from_list(
-                self.orthology_group.orthologs
-            )
+            orthologs = self.orthology_group.drop_nans_from_orthologs_list()
             find_ortholog_in_annotation = pl.col("ensembl_id") == orthologs[i]
             index_of_ortholog_in_annotation = (
                 genomes.genomes_dict[species]
