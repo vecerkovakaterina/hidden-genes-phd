@@ -56,38 +56,17 @@ class OrthologyGroup:
     def get_max_size_orthology_group(orthology_table):
         return len(orthology_table.orthology_taxonomy_df.columns) - 1
 
-    # def calculate_score(self, orthology_table, i, taxon=None):
-    #     max_orthologs = self.get_max_size_orthology_group(orthology_table)
-    #     number_orthologs = len(self.drop_nans_from_list(self.orthologs))
-    #     self.score = number_orthologs / max_orthologs
-    #     if taxon:
-    #         self.score += self.taxon_score(i, orthology_table, taxon)
-    #
-    # def calculate_score_all_groups(self, orthology_table, taxon=None):
-    #     for i, group in enumerate(self.orthology_groups_list):
-    #         group.calculate_score(orthology_table, i, taxon)
-
-    def calculate_score_all_groups(self, orthology_table, orthology_groups, taxon=None):
+    def assign_score(self, orthology_table):
         max_orthologs = self.get_max_size_orthology_group(orthology_table)
+        number_orthologs = len(self.drop_nans_from_orthologs_list())
+        self.score = number_orthologs / max_orthologs
 
-        for i, og in enumerate(orthology_groups.orthology_groups_list):
-            number_orthologs = len(self.drop_nans_from_list(og.orthologs))
-            og.score = number_orthologs / max_orthologs
-            if taxon:
-                og.score += self.taxon_score(i, orthology_table, taxon)
-
-    def delete_full_groups(self, orthology_table, orthology_groups):
-        max_orthologs = self.get_max_size_orthology_group(orthology_table)
-        for orthology_group in orthology_groups.orthology_groups_list:
-            orthologs = OrthologyGroup.drop_nans_from_list(orthology_group.orthologs)
-            if len(orthologs) == max_orthologs:
-                # delete instance with no missing orthologs
-                orthology_groups.orthology_groups_list.remove(orthology_group)
-                del orthology_group
-
-    @classmethod
-    def rank_groups_by_score(cls, orthology_groups):
-        orthology_groups.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
+    def is_full(self, ortology_table):
+        max_orthologs = self.get_max_size_orthology_group(ortology_table)
+        if len(self.orthologs) == max_orthologs:
+            return True
+        else:
+            return False
 
     def create_ortholog_sequences_list(self):
         orthologs = self.drop_nans_from_list(self.orthologs)
