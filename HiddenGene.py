@@ -1,10 +1,11 @@
 from collections import Counter
+from pathlib import Path
 
 import polars as pl
 
-from hidden_genes_phd.Genome import Genome
-from hidden_genes_phd.OrthologyGroup import OrthologyGroup
-from hidden_genes_phd.OrthologyTable import OrthologyTable
+from Genome import Genome
+from OrthologyGroup import OrthologyGroup
+from OrthologyTable import OrthologyTable
 
 
 class HiddenGene:
