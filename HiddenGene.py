@@ -46,7 +46,7 @@ class HiddenGene:
             )
             find_ortholog_in_annotation = pl.col("ensembl_id") == orthologs[i]
             index_of_ortholog_in_annotation = (
-                genomes[species]
+                genomes.genomes_dict[species]
                 .annotation.df.filter(find_ortholog_in_annotation)
                 .select(pl.col("index"))
                 .item()
@@ -57,7 +57,7 @@ class HiddenGene:
             while len(neighbors) < n_neighbors_to_search:
                 if side == "left":
                     next_gene_ensembl_id = (
-                        genomes[species]
+                        genomes.genomes_dict[species]
                         .annotation.df.slice(
                             offset=index_of_ortholog_in_annotation - counter,
                             length=1,
@@ -67,7 +67,7 @@ class HiddenGene:
                     )
                 elif side == "right":
                     next_gene_ensembl_id = (
-                        genomes[species]
+                        genomes.genomes_dict[species]
                         .annotation.df.slice(
                             offset=index_of_ortholog_in_annotation + counter,
                             length=1,
@@ -100,7 +100,7 @@ class HiddenGene:
         # ensembl ids to orthology groups
         for i, neighbors in enumerate(neighbors_ensembl_ids):
             for j, neighbor in enumerate(neighbors):
-                for orthology_group in orthology_groups:
+                for orthology_group in orthology_groups.orthology_groups_list:
                     if neighbor in orthology_group.orthologs:
                         neighbors_ensembl_ids[i][j] = orthology_group
                 if not isinstance(
