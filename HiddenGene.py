@@ -18,6 +18,7 @@ class HiddenGene:
         self.right_neighbor = None
         self.right_neighbor_orthology_group = None
         self.region_between_neighbors = None
+        self.region_between_neighbors_fasta = None
         self.coordinates = None
         self.sequence = None
         self.overlaps_with = None
