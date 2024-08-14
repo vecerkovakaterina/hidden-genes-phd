@@ -98,7 +98,7 @@ class HiddenGene:
         # ensembl ids to orthology groups
         for i, neighbors in enumerate(neighbors_ensembl_ids):
             for j, neighbor in enumerate(neighbors):
-                for orthology_group in orthology_groups.orthology_groups_list:
+                for orthology_group in orthology_groups:
                     if neighbor in orthology_group.orthologs:
                         neighbors_ensembl_ids[i][j] = orthology_group
                 if not isinstance(
