@@ -21,9 +21,8 @@ class OrthologyGroup:
             return self.orthologs == other.orthologs
         return False
 
-    @staticmethod
-    def drop_nans_from_list(lst):
-        return [x for x in lst if str(x) != "nan"]
+    def drop_nans_from_orthologs_list(self):
+        return [ortholog for ortholog in self.orthologs if str(ortholog) != "nan"]
 
     @staticmethod
     def taxon_score(col, orthology_table, taxon):
