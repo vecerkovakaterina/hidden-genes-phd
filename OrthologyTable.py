@@ -92,13 +92,11 @@ class OrthologyTable:
                 del species[nan]
             OrthologyGroup(row, species, orthology_groups)
 
-    def get_species_ortholog_ensmebl_id_from_group(self, genome_name, orthology_group):
+    def get_species_ortholog_ensmebl_id_from_group(self, genome_name, orthology_group, orthology_table):
         species_name_table = genome_name.species_name.replace("_", " ").capitalize()
         species_genes = self.orthology_df.get_column(species_name_table).to_list()
-        species_genes = OrthologyGroup.drop_nans_from_list(species_genes)
-        neighbor_orthologs = OrthologyGroup.drop_nans_from_list(
-            orthology_group.orthologs
-        )
+        species_genes = [gene for gene in species_genes if str(gene) != "nan"]
+        neighbor_orthologs = orthology_group.drop_nans_from_orthologs_list(orthology_table)
         species_neighbor_ensembl_id = [
             ensembl_id
             for ensembl_id in neighbor_orthologs
