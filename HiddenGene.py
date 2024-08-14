@@ -5,7 +5,6 @@ import polars as pl
 
 from Genome import Genome
 from OrthologyGroup import OrthologyGroup
-from OrthologyTable import OrthologyTable
 
 
 class HiddenGene:

@@ -4,7 +4,6 @@ import polars as pl
 
 from Genome import Genome
 from OrthologyGroup import OrthologyGroup
-from Genomes import Genomes
 
 known_problematic_annotation_names = {
     "heterocephalus_glaber": "heterocephalus_glaber_female",
