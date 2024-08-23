@@ -82,17 +82,19 @@ class OrthologyGroup:
         return ortholog_aa_sequences
 
     def write_ortholog_sequences_to_fasta(self):
-        aa_sequences_filename = Path(
-            "ortholog_sequences",
-            f"{'_'.join(self.drop_nans_from_orthologs_list()) + '.fa'}",
-        )
-        if not aa_sequences_filename.is_file():
-            # check if file exists already
-            aa_sequences = self.create_ortholog_sequences_list()
-            aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])
+        orthologs = self.drop_nans_from_orthologs_list()
+        if len(orthologs) > 0:
+            aa_sequences_filename = Path(
+                "ortholog_sequences",
+                f"{'_'.join(orthologs) + '.fa'}",
+            )
+            if not aa_sequences_filename.is_file():
+                # check if file exists already
+                aa_sequences = self.create_ortholog_sequences_list()
+                aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])
 
-            with open(aa_sequences_filename, "w") as fasta_file:
-                fasta_file.write(aa_sequences)
+                with open(aa_sequences_filename, "w") as fasta_file:
+                    fasta_file.write(aa_sequences)
 
             self.sequences_fasta = aa_sequences_filename
 
