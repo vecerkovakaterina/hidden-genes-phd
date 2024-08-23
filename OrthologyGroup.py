@@ -99,16 +99,17 @@ class OrthologyGroup:
             self.sequences_fasta = aa_sequences_filename
 
     def fasta_to_custom_blast_db(self):
-        command = f"makeblastdb -in {self.sequences_fasta} -parse_seqids -dbtype prot"
-        result = subprocess.run(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            raise Exception(
-                f"Error when creating custom BLAST db: {self.sequences_fasta}!"
+        if self.sequences_fasta is not None:
+            command = f"makeblastdb -in hidden_genes_phd/{self.sequences_fasta} -parse_seqids -dbtype prot" # TODO subprocess.CalledProcessError: Command 'makeblastdb -n None -parse_seqids -bdtype prot' returned non-zero exit status 1.
+            result = subprocess.run(
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                # check=True, # comment for exception catch to works
+                text=True,
+            )
+            if result.returncode != 0:
+                raise Exception(
+                    f"Error when creating custom BLAST db: {self.sequences_fasta}!"
             )
