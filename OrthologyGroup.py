@@ -52,21 +52,16 @@ class OrthologyGroup:
             )
         return full_orthology_group
 
-    @staticmethod
-    def get_max_size_orthology_group(orthology_table):
-        return len(orthology_table.orthology_taxonomy_df.columns) - 1
-
     def assign_score(self, orthology_table):
-        max_orthologs = self.get_max_size_orthology_group(orthology_table)
+        max_orthologs = orthology_table.max_number_orthologs
         number_orthologs = len(self.drop_nans_from_orthologs_list())
         self.score = number_orthologs / max_orthologs
 
-    def is_full(self, ortology_table):
-        max_orthologs = self.get_max_size_orthology_group(ortology_table)
-        if len(self.orthologs) == max_orthologs:
-            return True
-        else:
+    def is_full(self):
+        if 'nan' in self.orthologs:
             return False
+        else:
+            return True
 
     def create_ortholog_sequences_list(self):
         orthologs = self.drop_nans_from_orthologs_list()
