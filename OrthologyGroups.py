@@ -1,4 +1,4 @@
-import concurrent.futures
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class OrthologyGroups:
@@ -43,6 +43,6 @@ class OrthologyGroups:
         orthology_group.write_ortholog_sequences_to_fasta()
 
     def write_ortholog_sequences_to_fastas(self):
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(OrthologyGroups.write_ortholog_sequences_to_fasta, self)
+        with ThreadPoolExecutor() as executor:
+            executor.map(OrthologyGroups.write_ortholog_sequences_to_fasta, self.orthology_groups_list)
 
