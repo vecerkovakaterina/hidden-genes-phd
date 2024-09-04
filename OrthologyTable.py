@@ -18,6 +18,10 @@ class OrthologyTable:
         self.table_file = path_to_orthology_table
         self.orthology_df = self.parse_orthology_table()
         self.orthology_taxonomy_df = None
+        self.max_number_orthologs = self.get_max_number_orthologs()
+
+    def get_max_number_orthologs(self):
+        return self.orthology_df.width
 
     @classmethod
     def file_exists(cls, file):
