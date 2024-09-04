@@ -30,9 +30,13 @@ class OrthologyGroups:
         self.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
         return self
 
+    @staticmethod
+    def create_custom_blast_db(orthology_group):
+        orthology_group.fasta_to_custom_blast_db()
+
     def create_custom_blast_dbs(self):
-        for group in self:
-            group.fasta_to_custom_blast_db()
+        with ThreadPoolExecutor() as executor:
+            executor.map(OrthologyGroups.create_custom_blast_db, self.orthology_groups_list)
 
     @staticmethod
     def write_ortholog_sequences_to_fasta(orthology_group):
