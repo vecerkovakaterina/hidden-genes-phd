@@ -14,10 +14,15 @@ class OrthologyGroups:
             group.assign_score(orthology_table)
         return self
 
-    def remove_full_groups(self, orthology_table):
-        for group in self:
-            if group.is_full(orthology_table):
-                self.orthology_groups_list.remove(group)
+    def remove_full_groups(self):
+        with ThreadPoolExecutor() as executor:
+            futures = {executor.submit(group.is_full): group for group in self}
+
+            for future in as_completed(futures):
+                group = futures[future]
+                if future.result():
+                    self.orthology_groups_list.remove(group)
+
         return self
 
     def rank_groups_by_score(self, orthology_table):
