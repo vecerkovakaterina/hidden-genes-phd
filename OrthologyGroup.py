@@ -56,6 +56,7 @@ class OrthologyGroup:
         max_orthologs = orthology_table.max_number_orthologs
         number_orthologs = len(self.drop_nans_from_orthologs_list())
         self.score = number_orthologs / max_orthologs
+        return self
 
     def is_full(self):
         if 'nan' in self.orthologs:
