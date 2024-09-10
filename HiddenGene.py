@@ -244,6 +244,10 @@ class HiddenGene:
                     fasta_file.write(self.region_between_neighbors)
                 self.region_between_neighbors_fasta = region_sequence_fasta_filename
 
+    def blast_region_to_ortholog_database(self):
+        # TODO
+        pass
+
     def find_overlapping_annotation(self):
         # TODO
         pass
