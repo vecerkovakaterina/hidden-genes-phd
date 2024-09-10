@@ -8,7 +8,6 @@ from OrthologyGroup import OrthologyGroup
 
 
 class HiddenGene:
-    # hidden_genes_list = []
 
     def __init__(self, orthology_group, genome):
         self.orthology_group = orthology_group
