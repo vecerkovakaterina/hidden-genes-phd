@@ -16,7 +16,7 @@ class OrthologyGroups:
 
     @staticmethod
     def score_orthology_group(orthology_group, orthology_table):
-        orthology_group.assign_score(orthology_table)
+        return orthology_group.assign_score(orthology_table)
 
     def rank_groups_by_score(self, orthology_table):  # TODO parallelize
         # self.score_all_groups(orthology_table)
@@ -24,6 +24,8 @@ class OrthologyGroups:
         # return self
         with ThreadPoolExecutor() as executor:
             executor.map(OrthologyGroups.score_orthology_group, self.orthology_groups_list)
+        self.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
+        return self.orthology_groups_list
 
     def remove_full_groups(self):
         with ThreadPoolExecutor() as executor:
