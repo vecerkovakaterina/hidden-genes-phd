@@ -56,6 +56,7 @@ class OrthologyGroup:
         max_orthologs = orthology_table.max_number_orthologs
         number_orthologs = len(self.drop_nans_from_orthologs_list())
         self.score = number_orthologs / max_orthologs
+        return self
 
     def is_full(self):
         if 'nan' in self.orthologs:
@@ -84,14 +85,17 @@ class OrthologyGroup:
                 f"{'_'.join(orthologs) + '.fa'}",
             )
             if not aa_sequences_filename.is_file():
-                # check if file exists already
-                aa_sequences = self.create_ortholog_sequences_list()
-                aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])
+                # aa_sequences = self.create_ortholog_sequences_list()   # TODO uncomment after testing
 
-                with open(aa_sequences_filename, "w") as fasta_file:
-                    fasta_file.write(aa_sequences)
+                # if len(aa_sequences) > 0:
+                if True:  # TODO delete after testing
 
-            self.sequences_fasta = aa_sequences_filename
+                    # aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])    # TODO uncomment after testing
+
+                    # with open(aa_sequences_filename, "w") as fasta_file:
+                    #     fasta_file.write(aa_sequences)
+
+                        self.sequences_fasta = aa_sequences_filename
 
     def fasta_to_custom_blast_db(self):
         if self.sequences_fasta is not None:
