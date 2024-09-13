@@ -8,7 +8,6 @@ from OrthologyGroup import OrthologyGroup
 
 
 class HiddenGene:
-    # hidden_genes_list = []
 
     def __init__(self, orthology_group, genome):
         self.orthology_group = orthology_group
@@ -244,6 +243,10 @@ class HiddenGene:
                 with open(region_sequence_fasta_filename, "w") as fasta_file:
                     fasta_file.write(self.region_between_neighbors)
                 self.region_between_neighbors_fasta = region_sequence_fasta_filename
+
+    def blast_region_to_ortholog_database(self):
+        # TODO
+        pass
 
     def find_overlapping_annotation(self):
         # TODO
