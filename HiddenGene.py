@@ -263,9 +263,19 @@ class HiddenGene:
                     )
                 self.blast_output = output_file
 
+    def parse_blast_output(self):
+        if not self.blast_output:
+            return None
+        column_names = ["query_id", "target_id", "identity_pct", "aln_length", "mismatches", "gaps", "aln_start_query", "aln_end_query", "aln_start_target", "aln_end_target", "evalue", "bitscore"]
+        blast_output_df = pl.read_csv(self.blast_output, separator="\t", has_header=False, new_columns=column_names)
+        return blast_output_df
+
     def get_best_blast_hit(self):
-        # TODO
-        pass
+        blast_output_df = self.parse_blast_output()
+        if not blast_output_df:
+            return None
+        blast_output_df = blast_output_df.sort(by="bitscore", descending=True)
+        return blast_output_df[0, ]
 
     def find_overlapping_annotation(self):
         # TODO
