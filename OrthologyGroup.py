@@ -59,7 +59,7 @@ class OrthologyGroup:
         return self
 
     def is_full(self):
-        if 'nan' in self.orthologs:
+        if "nan" in self.orthologs:
             return False
         else:
             return True
@@ -88,8 +88,9 @@ class OrthologyGroup:
                 aa_sequences = self.create_ortholog_sequences_list()
 
                 if len(aa_sequences) > 0:
-
-                    aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])
+                    aa_sequences = "\n".join(
+                        ["\n".join(sequence) for sequence in aa_sequences]
+                    )
 
                     with open(aa_sequences_filename, "w") as fasta_file:
                         fasta_file.write(aa_sequences)
@@ -98,7 +99,9 @@ class OrthologyGroup:
 
     def fasta_to_custom_blast_db(self):
         if self.sequences_fasta is not None:
-            command = f"makeblastdb -in {self.sequences_fasta} -parse_seqids -dbtype prot"
+            command = (
+                f"makeblastdb -in {self.sequences_fasta} -parse_seqids -dbtype prot"
+            )
             result = subprocess.run(
                 command,
                 shell=True,
@@ -109,4 +112,4 @@ class OrthologyGroup:
             if result.returncode != 0:
                 raise Exception(
                     f"Error when creating custom BLAST db: {self.sequences_fasta}!"
-            )
+                )

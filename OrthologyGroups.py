@@ -20,8 +20,12 @@ class OrthologyGroups:
 
     def rank_groups_by_score(self, orthology_table):
         with ThreadPoolExecutor() as executor:
-            executor.map(lambda group: OrthologyGroups.score_orthology_group(group, orthology_table),
-                         self.orthology_groups_list)
+            executor.map(
+                lambda group: OrthologyGroups.score_orthology_group(
+                    group, orthology_table
+                ),
+                self.orthology_groups_list,
+            )
 
         self.orthology_groups_list.sort(key=lambda x: x.score, reverse=True)
         return self
@@ -43,7 +47,9 @@ class OrthologyGroups:
 
     def create_custom_blast_dbs(self):
         with ThreadPoolExecutor() as executor:
-            executor.map(OrthologyGroups.create_custom_blast_db, self.orthology_groups_list)
+            executor.map(
+                OrthologyGroups.create_custom_blast_db, self.orthology_groups_list
+            )
 
     @staticmethod
     def write_ortholog_sequences_to_fasta(orthology_group):
@@ -51,5 +57,7 @@ class OrthologyGroups:
 
     def write_ortholog_sequences_to_fastas(self):
         with ThreadPoolExecutor() as executor:
-            executor.map(OrthologyGroups.write_ortholog_sequences_to_fasta, self.orthology_groups_list)
-
+            executor.map(
+                OrthologyGroups.write_ortholog_sequences_to_fasta,
+                self.orthology_groups_list,
+            )

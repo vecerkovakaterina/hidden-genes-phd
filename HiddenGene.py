@@ -9,7 +9,6 @@ from OrthologyGroup import OrthologyGroup
 
 
 class HiddenGene:
-
     def __init__(self, orthology_group, genome):
         self.orthology_group = orthology_group
         self.missing_from_genome = genome
@@ -112,9 +111,7 @@ class HiddenGene:
         for i in neighbors_ensembl_ids[1:]:
             counter.update(i)
 
-        occurences = (
-            counter.most_common()
-        )  # TODO more equally frequent ones, can check for the closest one from the most frequent ones
+        occurences = counter.most_common()  # TODO more equally frequent ones, can check for the closest one from the most frequent ones
         if len(occurences) > 0:
             # take another one if the most frequent one is None
             if occurences[0][0] is None and len(occurences) > 1:
@@ -129,14 +126,16 @@ class HiddenGene:
             self.left_neighbor = (
                 orthology_table.get_species_ortholog_ensmebl_id_from_group(
                     self.missing_from_genome,
-                    self.left_neighbor_orthology_group, orthology_table
+                    self.left_neighbor_orthology_group,
+                    orthology_table,
                 )
             )
         if self.right_neighbor_orthology_group:
             self.right_neighbor = (
                 orthology_table.get_species_ortholog_ensmebl_id_from_group(
                     self.missing_from_genome,
-                    self.right_neighbor_orthology_group, orthology_table
+                    self.right_neighbor_orthology_group,
+                    orthology_table,
                 )
             )
 
@@ -233,7 +232,7 @@ class HiddenGene:
         if self.region_between_neighbors:
             region_sequence_fasta_filename = Path(
                 "regions_to_search",
-                f"{'_'.join([self.missing_from_genome.species_name, self.left_neighbor, self.right_neighbor])}.fa"
+                f"{'_'.join([self.missing_from_genome.species_name, self.left_neighbor, self.right_neighbor])}.fa",
             )
             if not region_sequence_fasta_filename.is_file():
                 with open(region_sequence_fasta_filename, "w") as fasta_file:
@@ -241,14 +240,15 @@ class HiddenGene:
                 self.region_between_neighbors_fasta = region_sequence_fasta_filename
 
     def blast_region_to_ortholog_database(self):
-        if (self.orthology_group.sequences_fasta is not None):
+        if self.orthology_group.sequences_fasta is not None:
             orthologs = self.orthology_group.drop_nans_from_orthologs_list()
             output_file = Path(
                 "blastx_search",
                 f"{self.missing_from_genome.species_name}_{'_'.join(orthologs) + '.out'}",
             )
-            if ((not output_file.is_file()) and
-                    (self.region_between_neighbors_fasta is not None)):
+            if (not output_file.is_file()) and (
+                self.region_between_neighbors_fasta is not None
+            ):
                 command = f"blastx -db {self.orthology_group.sequences_fasta} -query {self.region_between_neighbors_fasta} -out {output_file} -outfmt 6"
                 result = subprocess.run(
                     command,
@@ -259,7 +259,7 @@ class HiddenGene:
                 )
                 if result.returncode != 0:
                     raise Exception(
-                        f"Error when searching for a gene hidden in {self.missing_from_genome} with orthology group {self.orthology_group}!" # todo
+                        f"Error when searching for a gene hidden in {self.missing_from_genome} with orthology group {self.orthology_group}!"  # todo
                     )
                 self.blast_output = output_file
 
