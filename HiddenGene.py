@@ -1,5 +1,6 @@
 from collections import Counter
 from pathlib import Path
+import subprocess
 
 import polars as pl
 
@@ -18,6 +19,7 @@ class HiddenGene:
         self.right_neighbor_orthology_group = None
         self.region_between_neighbors = None
         self.region_between_neighbors_fasta = None
+        self.blast_output = None
         self.coordinates = None
         self.sequence = None
         self.overlaps_with = None
@@ -231,13 +233,7 @@ class HiddenGene:
         if self.region_between_neighbors:
             region_sequence_fasta_filename = Path(
                 "regions_to_search",
-                "_".join(
-                    [
-                        self.missing_from_genome.species_name,
-                        self.left_neighbor,
-                        self.right_neighbor,
-                    ]
-                ),
+                f"{'_'.join([self.missing_from_genome.species_name, self.left_neighbor, self.right_neighbor])}.fa"
             )
             if not region_sequence_fasta_filename.is_file():
                 with open(region_sequence_fasta_filename, "w") as fasta_file:
@@ -245,6 +241,29 @@ class HiddenGene:
                 self.region_between_neighbors_fasta = region_sequence_fasta_filename
 
     def blast_region_to_ortholog_database(self):
+        if (self.orthology_group.sequences_fasta is not None):
+            orthologs = self.orthology_group.drop_nans_from_orthologs_list()
+            output_file = Path(
+                "blastx_search",
+                f"{self.missing_from_genome.species_name}_{'_'.join(orthologs) + '.out'}",
+            )
+            if ((not output_file.is_file()) and
+                    (self.region_between_neighbors_fasta is not None)):
+                command = f"blastx -db {self.orthology_group.sequences_fasta} -query {self.region_between_neighbors_fasta} -out {output_file} -outfmt 6"
+                result = subprocess.run(
+                    command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                if result.returncode != 0:
+                    raise Exception(
+                        f"Error when searching for a gene hidden in {self.missing_from_genome} with orthology group {self.orthology_group}!" # todo
+                    )
+                self.blast_output = output_file
+
+    def get_best_blast_hit(self):
         # TODO
         pass
 
