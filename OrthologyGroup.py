@@ -85,15 +85,14 @@ class OrthologyGroup:
                 f"{'_'.join(orthologs) + '.fa'}",
             )
             if not aa_sequences_filename.is_file():
-                # aa_sequences = self.create_ortholog_sequences_list()   # TODO uncomment after testing
+                aa_sequences = self.create_ortholog_sequences_list()
 
-                # if len(aa_sequences) > 0:
-                if True:  # TODO delete after testing
+                if len(aa_sequences) > 0:
 
-                    # aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])    # TODO uncomment after testing
+                    aa_sequences = "\n".join(["\n".join(sequence) for sequence in aa_sequences])
 
-                    # with open(aa_sequences_filename, "w") as fasta_file:
-                    #     fasta_file.write(aa_sequences)
+                    with open(aa_sequences_filename, "w") as fasta_file:
+                        fasta_file.write(aa_sequences)
 
                         self.sequences_fasta = aa_sequences_filename
 
