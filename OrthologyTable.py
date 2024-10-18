@@ -100,7 +100,7 @@ class OrthologyTable:
         species_name_table = genome_name.species_name.replace("_", " ").capitalize()
         species_genes = self.orthology_df.get_column(species_name_table).to_list()
         species_genes = [gene for gene in species_genes if str(gene) != "nan"]
-        neighbor_orthologs = orthology_group.drop_nans_from_orthologs_list(orthology_table)
+        neighbor_orthologs = orthology_group.drop_nans_from_orthologs_list()
         species_neighbor_ensembl_id = [
             ensembl_id
             for ensembl_id in neighbor_orthologs
