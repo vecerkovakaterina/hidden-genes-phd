@@ -56,17 +56,18 @@ class Genome:
         return pathlib.Path("genomes", self.annotation_name + ".gtf").exists()
 
     def download_annotation(self):
-        if self.annotation_name_exists():
-            self.ftp_link = gget.ref(
-                self.annotation_name,
-                which=["gtf"],
-                release=self.ensembl_release,
-            )[self.annotation_name]["annotation_gtf"]["ftp"]
-
         if not self.annotation_downloaded():
-            gtf_gz = pathlib.Path("genomes", self.annotation_name + ".gtf.gz")
-            urllib.request.urlretrieve(self.ftp_link, gtf_gz)
-            self.unpack_gz(gtf_gz, self.annotation_file)
+            if self.annotation_name_exists():
+                self.ftp_link = gget.ref(
+                    self.annotation_name,
+                    which=["gtf"],
+                    release=self.ensembl_release,
+                )[self.annotation_name]["annotation_gtf"]["ftp"]
+
+                gtf_gz = pathlib.Path("genomes", self.annotation_name + ".gtf.gz")
+                urllib.request.urlretrieve(self.ftp_link, gtf_gz)
+                self.unpack_gz(gtf_gz, self.annotation_file)
+
 
     def create_annotation_object(self):
         annotation = Annotation(self.annotation_file)
