@@ -1,6 +1,7 @@
 import re
-
+import pybedtools
 import polars as pl
+
 
 
 def custom_sort_scaffold_id(item):
@@ -18,13 +19,19 @@ class Annotation:
     def __init__(self, gtf_file):
         self.gtf_file = gtf_file
         self.df = None
+        self.bedtools_annotation = None
 
         if self.gtf_file_exists():
+            self.gtf_to_bedtools_ann()
             self.gtf_to_df()
             self.filter_only_genes()
             self.sort_df_by_coordinates()
             self.add_rownumbers_to_df()
             self.extract_ensembl_ids()
+
+
+    def gtf_to_bedtools_ann(self):
+        self.bedtools_annotation = pybedtools.BedTool(self.gtf_file)
 
     @staticmethod
     def is_gtf_header_line(line):
