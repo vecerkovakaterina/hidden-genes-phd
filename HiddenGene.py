@@ -247,21 +247,23 @@ class HiddenGene:
                 "blastx_search",
                 f"{self.missing_from_genome.species_name}_{'_'.join(orthologs) + '.out'}",
             )
-            if (not output_file.is_file()) and (
-                self.region_between_neighbors_fasta is not None
-            ):
-                command = f"blastx -db {self.orthology_group.sequences_fasta} -query {self.region_between_neighbors_fasta} -out {output_file} -outfmt 6"
-                result = subprocess.run(
-                    command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                )
-                if result.returncode != 0:
-                    raise Exception(
-                        f"Error when searching for a gene hidden in {self.missing_from_genome} with orthology group {self.orthology_group}!"  # todo
+            if not output_file.is_file():
+                if self.region_between_neighbors_fasta is not None:
+                    command = f"blastx -db {self.orthology_group.sequences_fasta} -query {self.region_between_neighbors_fasta} -out {output_file} -outfmt '6 qseq sseq'"
+                    result = subprocess.run(
+                        command,
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        text=True,
                     )
+                    if result.returncode != 0:
+                        raise Exception(
+                            f"Error when searching for a gene hidden in {self.missing_from_genome} with orthology group {self.orthology_group}!"
+                            # todo
+                        )
+                    self.blast_output = output_file
+            else:
                 self.blast_output = output_file
 
     def parse_blast_output(self):
