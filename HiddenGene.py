@@ -300,5 +300,8 @@ class HiddenGene:
             self.coordinates_bed = coords_bedtool
 
     def find_overlapping_annotation(self):
-        # TODO
-        pass
+        self.assign_coords()
+
+        if self.coordinates_bed:
+            self.overlaps_with = self.coordinates_bed.window(self.missing_from_genome.annotation.bedtools_annotation, w=1)
+            print(f"Overlaps with {self.overlaps_with}")
