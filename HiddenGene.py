@@ -1,7 +1,7 @@
 from collections import Counter
 from pathlib import Path
 import subprocess
-
+import pybedtools
 import polars as pl
 
 from Genome import Genome
@@ -20,6 +20,7 @@ class HiddenGene:
         self.region_between_neighbors_fasta = None
         self.blast_output = None
         self.coordinates = None
+        self.coordinates_bed = None
         self.sequence = None
         self.overlaps_with = None
 
@@ -57,7 +58,7 @@ class HiddenGene:
                     next_gene_ensembl_id = (
                         genomes.genomes_dict[species]
                         .annotation.df.slice(
-                            offset=index_of_ortholog_in_annotation - counter,
+                            offset=index_of_ortholog_in_annotation - counter,  # TODO all neighbors should be on the same scafoold -> check or subset
                             length=1,
                         )
                         .select(pl.col("ensembl_id"))
@@ -67,7 +68,7 @@ class HiddenGene:
                     next_gene_ensembl_id = (
                         genomes.genomes_dict[species]
                         .annotation.df.slice(
-                            offset=index_of_ortholog_in_annotation + counter,
+                            offset=index_of_ortholog_in_annotation + counter,   # TODO all neighbors should be on the same scafoold -> check or subset
                             length=1,
                         )
                         .select(pl.col("ensembl_id"))
@@ -276,6 +277,25 @@ class HiddenGene:
             return None
         blast_output_df = blast_output_df.sort(by="bitscore", descending=True)
         return blast_output_df[0, ]
+
+    def assign_coords(self):
+        best_hit = self.get_best_blast_hit()
+        if best_hit is not None:
+            chr = best_hit[0, "query_id"]
+            start = best_hit[0, "aln_start_query"]
+            end = best_hit[0, "aln_end_query"]
+
+            if start > end:
+                tmp = start
+                start = end
+                end = tmp
+
+            self.coordinates = (chr, start, end)
+            coords_bedtool = pybedtools.BedTool(
+                "\n".join([f"{chr}\t{start}\t{end}"]),
+                from_string=True
+            )
+            self.coordinates_bed = coords_bedtool
 
     def find_overlapping_annotation(self):
         # TODO
