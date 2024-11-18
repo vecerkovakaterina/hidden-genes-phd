@@ -97,6 +97,9 @@ class OrthologyGroup:
 
                         self.sequences_fasta = aa_sequences_filename
 
+            else:
+                self.sequences_fasta = aa_sequences_filename
+
     def fasta_to_custom_blast_db(self):
         if self.sequences_fasta is not None:
             command = (
