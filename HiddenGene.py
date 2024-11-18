@@ -275,7 +275,7 @@ class HiddenGene:
 
     def get_best_blast_hit(self):
         blast_output_df = self.parse_blast_output()
-        if not blast_output_df:
+        if blast_output_df is None or blast_output_df.is_empty():
             return None
         blast_output_df = blast_output_df.sort(by="bitscore", descending=True)
         return blast_output_df[0, ]
