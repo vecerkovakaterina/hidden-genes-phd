@@ -130,16 +130,14 @@ class HiddenGene:
             self.left_neighbor = (
                 orthology_table.get_species_ortholog_ensmebl_id_from_group(
                     self.missing_from_genome,
-                    self.left_neighbor_orthology_group,
-                    orthology_table,
+                    self.left_neighbor_orthology_group
                 )
             )
         if self.right_neighbor_orthology_group:
             self.right_neighbor = (
                 orthology_table.get_species_ortholog_ensmebl_id_from_group(
                     self.missing_from_genome,
-                    self.right_neighbor_orthology_group,
-                    orthology_table,
+                    self.right_neighbor_orthology_group
                 )
             )
 
