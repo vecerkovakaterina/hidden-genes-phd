@@ -55,10 +55,13 @@ class HiddenGene:
             counter = 1
             while len(neighbors) < n_neighbors_to_search:
                 if side == "left":
+                    positive_offset = index_of_ortholog_in_annotation - counter
+                    if positive_offset < 0:
+                        positive_offset = 0
                     next_gene_ensembl_id = (
                         genomes.genomes_dict[species]
                         .annotation.df.slice(
-                            offset=index_of_ortholog_in_annotation - counter,  # TODO all neighbors should be on the same scafoold -> check or subset
+                            offset=positive_offset,  # TODO all neighbors should be on the same scafoold -> check or subset
                             length=1,
                         )
                         .select(pl.col("ensembl_id"))
