@@ -250,7 +250,7 @@ class HiddenGene:
             )
             if not output_file.is_file():
                 if self.region_between_neighbors_fasta is not None:
-                    command = f"blastx -db {self.orthology_group.sequences_fasta} -query {self.region_between_neighbors_fasta} -out {output_file} -outfmt '6 qseq sseq'"
+                    command = f"blastx -db {self.orthology_group.sequences_fasta} -query {self.region_between_neighbors_fasta} -out {output_file} -outfmt 6"
                     result = subprocess.run(
                         command,
                         shell=True,
