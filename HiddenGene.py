@@ -72,7 +72,8 @@ class HiddenGene:
                     next_gene_ensembl_id = (
                         genomes.genomes_dict[species]
                         .annotation.df.slice(
-                            offset=index_of_ortholog_in_annotation + counter,   # TODO all neighbors should be on the same scafoold -> check or subset
+                            offset=index_of_ortholog_in_annotation
+                            + counter,  # TODO all neighbors should be on the same scafoold -> check or subset
                             length=1,
                         )
                         .select(pl.col("ensembl_id"))
@@ -116,7 +117,9 @@ class HiddenGene:
         for i in neighbors_ensembl_ids[1:]:
             counter.update(i)
 
-        occurences = counter.most_common()  # TODO more equally frequent ones, can check for the closest one from the most frequent ones
+        occurences = (
+            counter.most_common()
+        )  # TODO more equally frequent ones, can check for the closest one from the most frequent ones
         if len(occurences) > 0:
             # take another one if the most frequent one is None
             if occurences[0][0] is None and len(occurences) > 1:
@@ -130,15 +133,13 @@ class HiddenGene:
         if self.left_neighbor_orthology_group:
             self.left_neighbor = (
                 orthology_table.get_species_ortholog_ensmebl_id_from_group(
-                    self.missing_from_genome,
-                    self.left_neighbor_orthology_group
+                    self.missing_from_genome, self.left_neighbor_orthology_group
                 )
             )
         if self.right_neighbor_orthology_group:
             self.right_neighbor = (
                 orthology_table.get_species_ortholog_ensmebl_id_from_group(
-                    self.missing_from_genome,
-                    self.right_neighbor_orthology_group
+                    self.missing_from_genome, self.right_neighbor_orthology_group
                 )
             )
 
@@ -203,7 +204,7 @@ class HiddenGene:
 
         else:
             left_part_response = Genome.access_ensembl_api(
-                f"/sequence/region/{self.missing_from_genome.annotation_name}/{left_neighbor_scaffold}:{region_start}..{region_start+10000000}?",
+                f"/sequence/region/{self.missing_from_genome.annotation_name}/{left_neighbor_scaffold}:{region_start}..{region_start + 10000000}?",
                 content_type="text/x-fasta",
             )  # try to get maximum sequence to reach the end of the scaffold
             if left_part_response.status_code == 400:
@@ -240,7 +241,7 @@ class HiddenGene:
             if not region_sequence_fasta_filename.is_file():
                 with open(region_sequence_fasta_filename, "w") as fasta_file:
                     fasta_file.write(self.region_between_neighbors)
-                self.region_between_neighbors_fasta = region_sequence_fasta_filename
+            self.region_between_neighbors_fasta = region_sequence_fasta_filename
 
     def blast_region_to_ortholog_database(self):
         if self.orthology_group.sequences_fasta is not None:
@@ -271,8 +272,26 @@ class HiddenGene:
     def parse_blast_output(self):
         if not self.blast_output:
             return None
-        column_names = ["query_id", "target_id", "identity_pct", "aln_length", "mismatches", "gaps", "aln_start_query", "aln_end_query", "aln_start_target", "aln_end_target", "evalue", "bitscore"]
-        blast_output_df = pl.read_csv(self.blast_output, separator="\t", has_header=False, new_columns=column_names)
+        column_names = [
+            "query_id",
+            "target_id",
+            "identity_pct",
+            "aln_length",
+            "mismatches",
+            "gaps",
+            "aln_start_query",
+            "aln_end_query",
+            "aln_start_target",
+            "aln_end_target",
+            "evalue",
+            "bitscore",
+        ]
+        blast_output_df = pl.read_csv(
+            self.blast_output,
+            separator="\t",
+            has_header=False,
+            new_columns=column_names,
+        )
         return blast_output_df
 
     def get_best_blast_hit(self):
@@ -280,7 +299,7 @@ class HiddenGene:
         if blast_output_df is None or blast_output_df.is_empty():
             return None
         blast_output_df = blast_output_df.sort(by="bitscore", descending=True)
-        return blast_output_df[0, ]
+        return blast_output_df[0,]
 
     def assign_coords(self):
         best_hit = self.get_best_blast_hit()
@@ -296,8 +315,7 @@ class HiddenGene:
 
             self.coordinates = (chr, start, end)
             coords_bedtool = pybedtools.BedTool(
-                "\n".join([f"{chr}\t{start}\t{end}"]),
-                from_string=True
+                "\n".join([f"{chr}\t{start}\t{end}"]), from_string=True
             )
             self.coordinates_bed = coords_bedtool
 
@@ -305,5 +323,7 @@ class HiddenGene:
         self.assign_coords()
 
         if self.coordinates_bed:
-            self.overlaps_with = self.coordinates_bed.window(self.missing_from_genome.annotation.bedtools_annotation, w=1)
+            self.overlaps_with = self.coordinates_bed.window(
+                self.missing_from_genome.annotation.bedtools_annotation, w=1
+            )
             print(f"Overlaps with {self.overlaps_with}")

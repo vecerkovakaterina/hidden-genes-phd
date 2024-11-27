@@ -29,7 +29,6 @@ class Annotation:
             self.add_rownumbers_to_df()
             self.extract_ensembl_ids()
 
-
     def gtf_to_bedtools_ann(self):
         self.bedtools_annotation = pybedtools.BedTool(self.gtf_file)
 

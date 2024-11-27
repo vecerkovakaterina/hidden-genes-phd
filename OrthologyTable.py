@@ -77,7 +77,7 @@ class OrthologyTable:
         self.orthology_taxonomy_df = transposed_orthology_table
         return self
 
-    def create_genomes_for_species_in_table(self, genomes):  # TODO check
+    def create_genomes_for_species_in_table(self, genomes):
         annotation_names = self.get_annotation_names()
 
         for annotation in annotation_names:
@@ -96,9 +96,7 @@ class OrthologyTable:
                 del species[nan]
             OrthologyGroup(row, species, orthology_groups)
 
-    def get_species_ortholog_ensmebl_id_from_group(
-        self, genome_name, orthology_group
-    ):
+    def get_species_ortholog_ensmebl_id_from_group(self, genome_name, orthology_group):
         species_name_table = genome_name.species_name.replace("_", " ").capitalize()
         species_genes = self.orthology_df.get_column(species_name_table).to_list()
         species_genes = [gene for gene in species_genes if str(gene) != "nan"]

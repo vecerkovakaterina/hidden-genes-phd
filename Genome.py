@@ -68,7 +68,6 @@ class Genome:
                 urllib.request.urlretrieve(self.ftp_link, gtf_gz)
                 self.unpack_gz(gtf_gz, self.annotation_file)
 
-
     def create_annotation_object(self):
         annotation = Annotation(self.annotation_file)
         if annotation.gtf_file_exists():

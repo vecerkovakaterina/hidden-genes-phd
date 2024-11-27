@@ -22,21 +22,38 @@ class HiddenGenes:
                     self.add_hidden_gene(
                         HiddenGene(group, genomes.genomes_dict[species_names[j]])
                     )
+
     def export_to_cvs(self, file_path):
-        attributes = ["missing_from_genome_name", "orthology_group_first_ortholog", "left_neighbor", "right_neighbor", "region_between_neighbors",
-                      "region_between_neighbors_fasta", "blast_output", "coordinates", "sequence", "overlaps_with"]
+        attributes = [
+            "missing_from_genome_name",
+            "orthology_group_first_ortholog",
+            "left_neighbor",
+            "right_neighbor",
+            "region_between_neighbors",
+            "region_between_neighbors_fasta",
+            "blast_output",
+            "coordinates",
+            "sequence",
+            "overlaps_with",
+        ]
 
         with open(file_path, mode="w") as file:
             writer = csv.DictWriter(file, fieldnames=attributes)
             writer.writeheader()
             for hidden_gene in self.hidden_genes_list:
-                writer.writerow({"missing_from_genome_name": hidden_gene.missing_from_genome.species_name,
-                                 "orthology_group_first_ortholog": next(iter(hidden_gene.orthology_group.orthologs), None),
-                                 "left_neighbor": hidden_gene.left_neighbor,
-                                 "right_neighbor": hidden_gene.right_neighbor,
-                                 "region_between_neighbors": hidden_gene.region_between_neighbors,
-                                 "region_between_neighbors_fasta": hidden_gene.region_between_neighbors_fasta,
-                                 "blast_output": hidden_gene.blast_output,
-                                 "coordinates": hidden_gene.coordinates,
-                                 "sequence": hidden_gene.sequence,
-                                 "overlaps_with": hidden_gene.overlaps_with})
+                writer.writerow(
+                    {
+                        "missing_from_genome_name": hidden_gene.missing_from_genome.species_name,
+                        "orthology_group_first_ortholog": next(
+                            iter(hidden_gene.orthology_group.orthologs), None
+                        ),
+                        "left_neighbor": hidden_gene.left_neighbor,
+                        "right_neighbor": hidden_gene.right_neighbor,
+                        "region_between_neighbors": hidden_gene.region_between_neighbors,
+                        "region_between_neighbors_fasta": hidden_gene.region_between_neighbors_fasta,
+                        "blast_output": hidden_gene.blast_output,
+                        "coordinates": hidden_gene.coordinates,
+                        "sequence": hidden_gene.sequence,
+                        "overlaps_with": hidden_gene.overlaps_with,
+                    }
+                )
