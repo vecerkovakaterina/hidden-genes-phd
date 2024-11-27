@@ -1,7 +1,7 @@
 import re
-import pybedtools
-import polars as pl
 
+import polars as pl
+import pybedtools
 
 
 def custom_sort_scaffold_id(item):

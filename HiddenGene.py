@@ -1,8 +1,9 @@
+import subprocess
 from collections import Counter
 from pathlib import Path
-import subprocess
-import pybedtools
+
 import polars as pl
+import pybedtools
 
 from Genome import Genome
 from OrthologyGroup import OrthologyGroup
