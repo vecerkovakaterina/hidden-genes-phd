@@ -51,6 +51,7 @@ class HiddenGene:
                 .select(pl.col("index"))
                 .item()
             )
+            ortholog_scaffold = genomes.genomes_dict[species].annotation.df.filter(find_ortholog_in_annotation).select(pl.col("seqname")).item()
 
             neighbors = []
             counter = 1
@@ -79,6 +80,12 @@ class HiddenGene:
                         .select(pl.col("ensembl_id"))
                         .item()
                     )
+                # get next gene scaffold, add only if it matches to ortholog's scaffold
+                find_next_gene_in_annotation = pl.col("ensembl_id") == next_gene_ensembl_id
+                next_gene_scaffold = genomes.genomes_dict[species].annotation.df.filter(find_next_gene_in_annotation).select(pl.col("seqname")).item()
+                if ortholog_scaffold != next_gene_scaffold:
+                    break
+
                 # check if next gene present in annotation with hidden gene
                 if (
                     orthology_table.get_ensembl_id_of_ortholog_in_species(
